@@ -1,0 +1,18 @@
+.vscode/**
+.vscode-test/**
+src/**
+samples/**
+scripts/**
+tsconfig.json
+.gitignore
+**/*.map
+**/*.ts
+**/*.vsix
+node_modules/**
+
+# Runtime is the esbuild bundle at out/extension.js (vscode:prepublish).
+# tsc also writes per-module JS under out/<folder>/ that is never loaded.
+# Ignore all of out/, then re-include only the bundle so a new src folder
+# cannot leak unbundled .js into the VSIX.
+out/**
+!out/extension.js
