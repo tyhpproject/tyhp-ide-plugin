@@ -44,9 +44,9 @@
 ## 0.2.0
 
 - Register `.tyhp` and `.tyhpdef` file types (PHP must not claim Tyhp files)
-- Load the shared VS Code TextMate grammars (`tyhp-lang/vscode/syntaxes/`) at build time
+- Load the shared VS Code TextMate grammars (`../vscode/syntaxes/`) at build time
 - Comment / bracket / quote pairing matching VS Code `language-configuration.json`
-- Distinct Project-view file icons copied from `tyhp-lang/vscode/media/`
+- Distinct Project-view file icons copied from `../vscode/media/`
 
 ## 0.1.0
 

@@ -7,8 +7,8 @@
     "license": "Apache-2.0",
     "repository": {
         "type": "git",
-        "url": "https://github.com/tyhpproject/tyhp.git",
-        "directory": "tyhp-lang/vscode"
+        "url": "https://github.com/tyhpproject/tyhp-ide-plugin.git",
+        "directory": "vscode"
     },
     "engines": {
         "vscode": "^1.70.0"
@@ -173,12 +173,12 @@
                 "tyhp.xdebugProxy.idePort": {
                     "type": "number",
                     "default": 9003,
-                    "markdownDescription": "IDE listen port for `tyhp xdebug_proxy` (PHP Debug connects here). When unset, `tyhp.json` `xdebugProxy.idePort` is used, then Story 18 default `9003`."
+                    "markdownDescription": "IDE listen port for `tyhp xdebug_proxy` (PHP Debug connects here). When unset, `tyhp.json` `xdebugProxy.idePort` is used, then the CLI default `9003`."
                 },
                 "tyhp.xdebugProxy.xdebugPort": {
                     "type": "number",
                     "default": 9004,
-                    "markdownDescription": "XDebug engine listen port for `tyhp xdebug_proxy` (`xdebug.client_port`). When unset, `tyhp.json` `xdebugProxy.xdebugPort` is used, then Story 18 default `9004`."
+                    "markdownDescription": "XDebug engine listen port for `tyhp xdebug_proxy` (`xdebug.client_port`). When unset, `tyhp.json` `xdebugProxy.xdebugPort` is used, then the CLI default `9004`."
                 },
                 "tyhp.xdebugProxy.sourceMapDir": {
                     "type": "string",

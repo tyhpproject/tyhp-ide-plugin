@@ -3,7 +3,7 @@ package com.tyhp.lang.editor
 import com.intellij.lang.Commenter
 
 /**
- * Matches `tyhp-lang/vscode/language-configuration.json` comments.
+ * Matches `../vscode/language-configuration.json` comments.
  */
 class TyhpCommenter : Commenter {
     override fun getLineCommentPrefix(): String = "//"

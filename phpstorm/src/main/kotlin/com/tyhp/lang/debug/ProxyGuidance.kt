@@ -6,10 +6,10 @@ package com.tyhp.lang.debug
  */
 
 const val SOURCEMAP_DOCS_URL =
-    "https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_sourcemapGeneration.md"
+    "https://tyhplang.com/cli_sourcemapGeneration.html"
 
 const val XDEBUG_PROXY_DOCS_URL =
-    "https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_xdebugProxy.md"
+    "https://tyhplang.com/cli_xdebugProxy.html"
 
 const val TYHP_PHP_DEBUG_CONFIG_NAME = "Listen for Tyhp (XDebug proxy)"
 

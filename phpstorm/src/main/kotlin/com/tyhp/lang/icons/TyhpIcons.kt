@@ -5,7 +5,7 @@ import javax.swing.Icon
 
 /**
  * Project-view icons. SVGs are copied at build time from
- * `tyhp-lang/vscode/media/` (canonical source). IntelliJ picks
+ * `../vscode/media/` (canonical source). IntelliJ picks
  * `*_dark.svg` in Darcula / dark themes.
  */
 object TyhpIcons {

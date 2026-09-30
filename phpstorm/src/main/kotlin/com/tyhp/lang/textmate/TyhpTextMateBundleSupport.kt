@@ -10,7 +10,7 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 /**
- * Resolves the TextMate bundle directory copied from `tyhp-lang/vscode/syntaxes/`
+ * Resolves the TextMate bundle directory copied from `../vscode/syntaxes/`
  * at Gradle build time. Prefers the unpacked plugin layout (`textmate/tyhp` next
  * to `lib/`); falls back to extracting classpath resources.
  */

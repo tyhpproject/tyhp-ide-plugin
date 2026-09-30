@@ -1,0 +1,39 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  vscode:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: vscode/package-lock.json
+
+      - name: Install, test, and package
+        run: npm ci && npm test && npm run package
+
+  phpstorm:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: phpstorm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Unit tests and plugin ZIP
+        run: ./gradlew unitTest buildPlugin --no-daemon

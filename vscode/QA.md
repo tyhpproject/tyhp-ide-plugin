@@ -1,12 +1,12 @@
 # Tyhp Language — VS Code / Cursor QA matrix
 
-Story 19.5 Phase 7. Repeatable **local** checklist for `tyhp-lang/vscode/`. **Do not** publish to the VS Code Marketplace or Open VSX as part of this matrix.
+Repeatable **local** checklist for `vscode/`. **Do not** publish to the VS Code Marketplace or Open VSX as part of this matrix.
 
-Product: **Tyhp Language** (`tyhp-lang`). Extension ID: `tyhp-lang.tyhp`. Artifact: `tyhp-<version>.vsix` (currently `tyhp-0.8.0.vsix`).
+Product: **Tyhp Language** (`tyhp-lang`). Extension ID: `tyhp-lang.tyhp`. Artifact: `tyhp-<version>.vsix` (currently `tyhp-0.8.1.vsix`).
 
 Cursor uses the **same VSIX**. There is no separate Cursor product.
 
-PhpStorm QA is **not** this file (`tyhp-lang/phpstorm/` is a different track).
+PhpStorm QA is **not** this file (`phpstorm/` is a different track).
 
 ## How to read this file (honesty)
 
@@ -22,7 +22,7 @@ Items below are **unsigned checkboxes for a human**. The “Verified in this env
 
 ## Sideload (does not publish)
 
-From `tyhp-lang/vscode/`:
+From `vscode/`:
 
 ```bash
 npm install
@@ -36,13 +36,13 @@ npm run package
 Install the VSIX (pick one editor):
 
 ```bash
-code --install-extension tyhp-0.8.0.vsix
-cursor --install-extension tyhp-0.8.0.vsix
+code --install-extension tyhp-0.8.1.vsix
+cursor --install-extension tyhp-0.8.1.vsix
 ```
 
 Or **Extensions** view → `…` → **Install from VSIX…**.
 
-Development alternative (not a Marketplace path): open `tyhp-lang/vscode` as the workspace and press **F5** (Extension Development Host). See README **Development (compile + F5)**.
+Development alternative (not a Marketplace path): open `vscode/` as the workspace and press **F5** (Extension Development Host). See README **Development (compile + F5)**.
 
 Uninstall:
 
@@ -57,19 +57,19 @@ If a **symlink** install already exists (`~/.vscode/extensions/tyhp-lang.tyhp-<v
 
 ## Packaging acceptance
 
-Run on the machine under test. Primary platform for this story: **macOS**.
+Run on the machine under test. Primary platform: **macOS**.
 
 - [ ] `npm run compile` exits 0
 - [ ] `npm test` exits 0 (unit tests; not a GUI substitute)
-- [ ] `npm run package` writes `tyhp-0.8.0.vsix` (version from `package.json`) and (via the built-in `check-package` step) fails if `out/` would ship anything besides `extension.js`
+- [ ] `npm run package` writes `tyhp-0.8.1.vsix` (version from `package.json`) and (via the built-in `check-package` step) fails if `out/` would ship anything besides `extension.js`
 - [ ] `npm run check-package` (`vsce ls`) on its own also confirms `out/extension.js` and no other `out/` files, without repackaging
 - [ ] VSIX contains `out/extension.js` (esbuild bundle) and does **not** contain any other `out/` file — no `out/binary/`, `out/config/`, `out/debug/`, `out/lsp/`, `out/status/`, `out/tasks/`, `out/workspace/`, or any future `out/<folder>/` that `tsc` writes
-- [ ] `code --install-extension tyhp-0.8.0.vsix` succeeds **or** Install from VSIX works, **or** the `code` CLI is missing and install is manual (note which)
-- [ ] Cursor: `cursor --install-extension tyhp-0.8.0.vsix` **or** Install from VSIX, same VSIX (compatibility only)
+- [ ] `code --install-extension tyhp-0.8.1.vsix` succeeds **or** Install from VSIX works, **or** the `code` CLI is missing and install is manual (note which)
+- [ ] Cursor: `cursor --install-extension tyhp-0.8.1.vsix` **or** Install from VSIX, same VSIX (compatibility only)
 - [ ] After install, `code --list-extensions` / `cursor --list-extensions` includes `tyhp-lang.tyhp` (CLI proof only)
 - [ ] **No** `vsce publish`, **no** Open VSX upload, **no** Marketplace submission
 
-Windows and Linux: same commands; not required to have been run for Phase 7 if macOS packaging succeeded. Record as follow-ups at the bottom.
+Windows and Linux: same commands; not required if macOS packaging succeeded. Record as follow-ups at the bottom.
 
 ---
 
@@ -162,9 +162,9 @@ Ports and sourcemap dir: an **explicit** `tyhp.xdebugProxy.*` setting wins; othe
 
 ## Editor-side LSP feature list
 
-Story 19 already proves these over stdin/stdout. This list proves them **through the extension**. All **Human GUI**. Use a small fixture project with `tyhp.json` and a valid `tyhp.path`.
+The compiler’s `tyhp language_server` already covers these over stdin/stdout. This list proves them **through the extension**. All **Human GUI**. Use a small fixture project with `tyhp.json` and a valid `tyhp.path`.
 
-Story 19 **does** advertise semantic tokens (full + delta), so include that row.
+The server advertises semantic tokens (full and delta), so include that row.
 
 | Feature | How to check | Pass? |
 |---------|----------------|-------|
@@ -183,13 +183,13 @@ Story 19 **does** advertise semantic tokens (full + delta), so include that row.
 | Code actions | Lightbulb / quick fix (and organize imports if offered) | [ ] |
 | Semantic tokens | With LSP up, semantic highlighting is additive on top of TextMate | [ ] |
 
-Also advertised by Story 19 (optional extra GUI; not required to call Phase 7 “checklist written”): document highlight, folding range, format document, selection range, workspace symbols.
+Optional extra GUI (not required to treat this checklist as written): document highlight, folding range, format document, selection range, workspace symbols.
 
 ---
 
 ## Cursor compatibility (same VSIX)
 
-Not a second product. After sideloading `tyhp-0.8.0.vsix` in Cursor:
+Not a second product. After sideloading `tyhp-0.8.1.vsix` in Cursor:
 
 - [ ] `.tyhp` opens as language **Tyhp**
 - [ ] Output **Tyhp Language Server** shows the client attached (same as VS Code)
@@ -200,7 +200,7 @@ F5 from this folder in Cursor is an acceptable smoke if VSIX sideload would over
 
 ## Windows / Linux follow-ups
 
-Not a Phase 7 blocker when macOS packaging succeeded.
+Not a packaging blocker when macOS packaging succeeded.
 
 - [ ] Windows: `npm run compile` / `npm run package` / `code --install-extension` (or Install from VSIX)
 - [ ] Linux: same

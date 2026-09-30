@@ -6,10 +6,10 @@
 export const PHP_DEBUG_EXTENSION_ID = "xdebug.php-debug";
 
 export const SOURCEMAP_DOCS_URL =
-    "https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_sourcemapGeneration.md";
+    "https://tyhplang.com/cli_sourcemapGeneration.html";
 
 export const XDEBUG_PROXY_DOCS_URL =
-    "https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_xdebugProxy.md";
+    "https://tyhplang.com/cli_xdebugProxy.html";
 
 export const TYHP_PHP_DEBUG_CONFIG_NAME = "Listen for Tyhp (XDebug proxy)";
 

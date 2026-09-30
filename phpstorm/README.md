@@ -4,9 +4,9 @@ First-party PhpStorm client for the Tyhp toolchain.
 
 Product: **Tyhp Language** (`tyhp-lang`). Plugin ID: `com.tyhp.lang`.
 
-**JetBrains Marketplace publish is out of scope** for Story 19.5. This plugin is installed locally (Gradle sandbox or **Install Plugin from Disk**).
+This plugin is installed locally (Gradle sandbox or **Install Plugin from Disk**). Publishing to the JetBrains Marketplace is a separate step from building the ZIP.
 
-**Local QA:** the repeatable sideload / packaging / editor checklist is [QA.md](./QA.md) (Story 19.5 Phase 14). It is a human matrix plus notes on what this repo’s `./gradlew unitTest` already covers — not a claim that every GUI item was clicked in this environment. Parity counterpart of `tyhp-lang/vscode/QA.md` (same scenarios, native PhpStorm UX).
+**Local QA:** the repeatable sideload / packaging / editor checklist is [QA.md](./QA.md). It is a human matrix plus notes on what this repo’s `./gradlew unitTest` already covers — not a claim that every GUI item was clicked in this environment. Parity counterpart of [`vscode/QA.md`](../vscode/QA.md) (same scenarios, native PhpStorm UX).
 
 Minimum IDE: **PhpStorm 2026.2** (`since-build` `262`). That baseline includes the IntelliJ Platform LSP API (`com.intellij.modules.lsp` / `com.intellij.platform.lsp`) including the 2026.1.4 client rename (`LspIntegrationProvider`). IntelliJ IDEA is not a supported target.
 
@@ -15,9 +15,9 @@ Minimum IDE: **PhpStorm 2026.2** (`since-build` `262`). That baseline includes t
 This 0.7.0 build starts **one language server per owned `tyhp.json`** (include/exclude membership, lazy start) and keeps XDebug-proxy debug, `tyhp init`, build/lint run configurations, a status bar, languages, TextMate highlighting, file icons, and CLI binary resolution:
 
 - **File types:** `.tyhp` → **Tyhp**, `.tyhpdef` → **Tyhp Definition**. A file-type overrider keeps PhpStorm’s PHP highlighter from claiming `<?tyhp` files.
-- **TextMate highlighting** from the canonical grammars in `tyhp-lang/vscode/syntaxes/` (copied into the plugin at Gradle build time; not forked). Works without the language server.
-- **Comments / brackets / quotes** matching `tyhp-lang/vscode/language-configuration.json` where the Platform supports it (`//`, `/* */`, `{}` `[]` `()` `<>`, `'` / `"`).
-- **Project-view icons** for `.tyhp` and `.tyhpdef` (light/dark variants from `tyhp-lang/vscode/media/`).
+- **TextMate highlighting** from the canonical grammars in `../vscode/syntaxes/` (copied into the plugin at Gradle build time; not forked). Works without the language server.
+- **Comments / brackets / quotes** matching `../vscode/language-configuration.json` where the Platform supports it (`//`, `/* */`, `{}` `[]` `()` `<>`, `'` / `"`).
+- **Project-view icons** for `.tyhp` and `.tyhpdef` (light/dark variants from `../vscode/media/`).
 - **CLI binary resolution** — PATH probe, `tyhp.path`, Install / Update CLI (global or plugin-only), checksum-verified GitHub Release downloads, plugin-only auto-update / pin. Language server, run configurations, and the XDebug proxy call `resolveTyhpBinary` rather than reading the setting ad hoc.
 - **Language server** — opening a `.tyhp` / `.tyhpdef` file starts `tyhp language_server` for the **owning** `tyhp.json` only (`LspIntegrationProvider`). Files that match no project’s `include` stay TextMate-only. `isSupportedFile` keeps each server on its own files.
 - **Workspace** — indexes nested `tyhp.json` files and matches `include`/`exclude` (or forced `tyhp.projectPath`). Opening a Tyhp file with no owner and no ancestor `tyhp.json` offers **Tyhp: Initialize Project** (`tyhp init --yes`).
@@ -35,7 +35,7 @@ If `java -version` is older than 17:
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17   # example: Homebrew
 ```
 
-From this directory (`tyhp-lang/phpstorm/`):
+From this directory (`phpstorm/`):
 
 ```bash
 ./gradlew runIde
@@ -49,7 +49,7 @@ Import this folder as a Gradle project in IntelliJ IDEA / PhpStorm to run the sa
 
 After `runIde` (do not need a full Tyhp project or LSP):
 
-1. Open `tyhp-lang/vscode/samples/highlight-audit.tyhp` and `highlight-audit.tyhpdef` (File → Open, or drop them into the sandbox project).
+1. Open `../vscode/samples/highlight-audit.tyhp` and `highlight-audit.tyhpdef` (File → Open, or drop them into the sandbox project).
 2. Confirm the editor status bar / tab file type is **Tyhp** / **Tyhp Definition**, not PHP.
 3. Confirm keywords (`struct`, `extension`, `async`), `//` / `/* */` comments, and strings are colored. Highlighting must work with the language server disabled.
 4. Confirm distinct file icons in the Project tool window for the two extensions.
@@ -59,12 +59,14 @@ After `runIde` (do not need a full Tyhp project or LSP):
 
 Does **not** publish to the JetBrains Marketplace:
 
+From the clone root:
+
 ```bash
-cd tyhp-lang/phpstorm
+cd phpstorm
 ./gradlew buildPlugin
 ```
 
-The task writes `build/distributions/tyhp-lang-<version>.zip` (currently `tyhp-lang-0.6.0.zip`). The ZIP includes copied grammars under `textmate/tyhp/syntaxes/` and file icons inside the plugin JAR (`icons/`).
+The task writes `build/distributions/tyhp-lang-<version>.zip` (currently `tyhp-lang-0.7.0.zip`, from `gradle.properties` `pluginVersion`). The ZIP includes copied grammars under `textmate/tyhp/syntaxes/` and file icons inside the plugin JAR (`icons/`).
 
 Equivalent helper:
 
@@ -78,7 +80,7 @@ Equivalent helper:
 2. In PhpStorm 2026.2+, open **Settings → Plugins**.
 3. Click the gear icon (⚙) next to the Plugins heading / installed-plugin search.
 4. Choose **Install Plugin from Disk…**
-5. Select `tyhp-lang/phpstorm/build/distributions/tyhp-lang-0.6.0.zip`.
+5. Select `phpstorm/build/distributions/tyhp-lang-0.7.0.zip`.
 6. Restart PhpStorm when prompted.
 
 This sideload path does not use JetBrains Marketplace credentials.
@@ -203,14 +205,14 @@ Requires a resolved Tyhp CLI (`tyhp.path` or PATH / Install CLI) and a small pro
 1. `./gradlew runIde`, then open a folder that contains `tyhp.json` plus a `.tyhp` file.
 2. Open the `.tyhp` file. **Language Services** should list **Tyhp**, and **Tyhp Language Server** should log a start line with `--quiet --stdio --tyhp-project=…/tyhp.json`.
 3. Introduce a syntax/type error; diagnostics should appear while the server is up.
-4. Hover a known symbol and **Go to Declaration** (the Story 19 features the CLI already supports).
+4. Hover a known symbol and **Go to Declaration**.
 5. Clear `tyhp.path` (and ensure `tyhp` is not on PATH) → error notification with Install / Refresh, plugin stays loaded.
 6. With the server running, terminate the `tyhp language_server` OS process yourself (do not ask the IDE to kill it from this plugin). The log should show an unexpected exit and a delayed restart.
 7. Close the project (or disable the plugin) and confirm the `language_server` process is gone.
 
 ### Debugging `.tyhp` (XDebug proxy)
 
-The plugin starts Story 18’s `tyhp xdebug_proxy` so PhpStorm’s **built-in XDebug** (PHP Remote Debug) can hit breakpoints in `.tyhp` sources. It does **not** reimplement DBGp.
+The plugin starts `tyhp xdebug_proxy` so PhpStorm’s **built-in XDebug** (PHP Remote Debug) can hit breakpoints in `.tyhp` sources. It does **not** reimplement DBGp.
 
 **Prerequisites**
 
@@ -224,7 +226,7 @@ The plugin starts Story 18’s `tyhp xdebug_proxy` so PhpStorm’s **built-in XD
 }
 ```
 
-See [Source map generation](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_sourcemapGeneration.md) and [XDebug proxy](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_xdebugProxy.md).
+See [Source map generation](https://tyhplang.com/cli_sourcemapGeneration.html) and [XDebug proxy](https://tyhplang.com/cli_xdebugProxy.html).
 
 2. Point XDebug at the proxy **XDebug port** (default **9004**), not the IDE / PhpStorm debug port:
 
@@ -266,9 +268,9 @@ PhpStorm’s built-in XDebug is the DBGp client. The plugin contributes/document
 | Symptom | What to do |
 |---------|------------|
 | Proxy will not start / port in use | Stop the proxy from the status bar, or change `tyhp.xdebugProxy.idePort` / `xdebugPort` (or `tyhp.json` `xdebugProxy`). See **Tyhp XDebug Proxy**. |
-| No sourcemaps / breakpoints stay on `.php` | Set `build.generateSourcemap` and rebuild. Docs: [sourcemaps](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_sourcemapGeneration.md). |
+| No sourcemaps / breakpoints stay on `.php` | Set `build.generateSourcemap` and rebuild. Docs: [sourcemaps](https://tyhplang.com/cli_sourcemapGeneration.html). |
 | PHP Remote Debug missing | Use **Create PHP Remote Debug Configuration**, or add PHP Remote Debug manually. PhpStorm’s XDebug is the DBGp client. |
-| Proxy down when debugging | Start the proxy first. Docs: [xdebug_proxy](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_xdebugProxy.md). |
+| Proxy down when debugging | Start the proxy first. Docs: [xdebug_proxy](https://tyhplang.com/cli_xdebugProxy.html). |
 
 ## Uninstalling
 

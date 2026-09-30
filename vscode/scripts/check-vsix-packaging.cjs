@@ -5,7 +5,7 @@ const { spawnSync } = require("child_process");
 const extRoot = path.join(__dirname, "..");
 const vsce = path.join(extRoot, "node_modules", ".bin", "vsce");
 if (!fs.existsSync(vsce)) {
-    console.error("vsce not found; run npm install in tyhp-lang/vscode");
+    console.error("vsce not found; run npm install in vscode/");
     process.exit(1);
 }
 

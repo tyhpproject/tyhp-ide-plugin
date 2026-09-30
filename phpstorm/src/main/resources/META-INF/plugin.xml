@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.tyhp.lang</id>
     <name>Tyhp Language</name>
-    <vendor url="https://github.com/tyhpproject/tyhp">tyhp-lang</vendor>
+    <vendor url="https://github.com/tyhpproject/tyhp-ide-plugin">tyhp-lang</vendor>
     <idea-version since-build="262"/>
     <version>0.7.0</version>
 
@@ -11,7 +11,7 @@
         and keeps XDebug-proxy debug, <code>tyhp init</code>,
         build/lint run configurations, a status bar, TextMate highlighting, file icons, and CLI binary resolution / install / updates.</p>
         <ul>
-            <li>TextMate highlighting for <code>.tyhp</code> / <code>.tyhpdef</code> (canonical grammars in <code>tyhp-lang/vscode/syntaxes/</code>)</li>
+            <li>TextMate highlighting for <code>.tyhp</code> / <code>.tyhpdef</code> (canonical grammars in the sibling <code>vscode/syntaxes/</code> directory)</li>
             <li>CLI PATH probe, <code>tyhp.path</code>, global vs plugin-only install, checksum-verified GitHub Release downloads, plugin-only auto-update / pin</li>
             <li><code>tyhp language_server</code> over stdin/stdout via <code>LspIntegrationProvider</code> (diagnostics, hover, go-to-definition, …)</li>
             <li>Detects nested <code>tyhp.json</code> by <code>include</code>/<code>exclude</code> (or forced <code>tyhp.projectPath</code>); offers <b>Tyhp: Initialize Project</b> when a Tyhp file has no owner and no ancestor <code>tyhp.json</code></li>

@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+._*
+
+# Python
+__pycache__/
+
+# Local-only
+.cursor/
+.idea/
+*.iml
+
+# Node
+node_modules/
+
+# VS Code extension output
+vscode/out/
+vscode/*.vsix
+vscode/.vscode-test/
+
+# PhpStorm / Gradle
+build/
+phpstorm/.gradle/
+phpstorm/.intellijPlatform/
+phpstorm/.kotlin/
+phpstorm/out/
+
+# Secrets
+.env
+*.credentials
+packagist.credentials

@@ -122,7 +122,7 @@ intellijPlatform {
         version = providers.gradleProperty("pluginVersion")
         vendor {
             name = "tyhp-lang"
-            url = "https://github.com/tyhpproject/tyhp"
+            url = "https://github.com/tyhpproject/tyhp-ide-plugin"
         }
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")

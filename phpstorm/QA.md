@@ -1,10 +1,10 @@
 # Tyhp Language — PhpStorm QA matrix
 
-Story 19.5 Phase 14. Repeatable **local** checklist for `tyhp-lang/phpstorm/`. **Do not** publish to the JetBrains Marketplace as part of this matrix.
+Repeatable **local** checklist for `phpstorm/`. **Do not** publish to the JetBrains Marketplace as part of this matrix.
 
-Product: **Tyhp Language** (`tyhp-lang`). Plugin ID: `com.tyhp.lang`. Artifact: `tyhp-lang-<version>.zip` (currently `tyhp-lang-0.6.0.zip`).
+Product: **Tyhp Language** (`tyhp-lang`). Plugin ID: `com.tyhp.lang`. Artifact: `tyhp-lang-<version>.zip` (currently `tyhp-lang-0.7.0.zip`).
 
-This file is the **parity counterpart** of [`tyhp-lang/vscode/QA.md`](../vscode/QA.md) (Phase 7). Same scenarios (TextMate, PATH / plugin-only binary, LSP, init, run configs, proxy, ZIP sideload, editor-side LSP feature list). Native PhpStorm UX — not a copy of VS Code menus.
+This file is the **parity counterpart** of [`vscode/QA.md`](../vscode/QA.md). Same scenarios (TextMate, PATH / plugin-only binary, LSP, init, run configs, proxy, ZIP sideload, editor-side LSP feature list). Native PhpStorm UX — not a copy of VS Code menus.
 
 Cursor uses the **VS Code VSIX**, not this plugin. There is no PhpStorm Cursor product.
 
@@ -24,7 +24,7 @@ Items below are **unsigned checkboxes for a human**. The “Verified in this env
 
 ## Sideload (does not publish)
 
-From `tyhp-lang/phpstorm/`:
+From `phpstorm/`:
 
 ```bash
 ./gradlew unitTest
@@ -32,7 +32,7 @@ From `tyhp-lang/phpstorm/`:
 # equivalent: ./package.sh
 ```
 
-The task writes `build/distributions/tyhp-lang-0.6.0.zip` (version from `gradle.properties` `pluginVersion`).
+The task writes `build/distributions/tyhp-lang-0.7.0.zip` (version from `gradle.properties` `pluginVersion`).
 
 ### Install Plugin from Disk
 
@@ -41,7 +41,7 @@ A headless agent cannot easily complete this. A person should:
 1. Open **PhpStorm 2026.2+** (minimum `since-build` `262`). IntelliJ IDEA is not a supported target.
 2. **Settings → Plugins**.
 3. Gear icon (⚙) next to the Plugins heading → **Install Plugin from Disk…**
-4. Select `tyhp-lang/phpstorm/build/distributions/tyhp-lang-0.6.0.zip`.
+4. Select `phpstorm/build/distributions/tyhp-lang-0.7.0.zip`.
 5. Restart PhpStorm when prompted.
 
 This sideload path does not use JetBrains Marketplace credentials. There is no supported `phpstorm --install-plugin` equivalent in this matrix.
@@ -54,16 +54,16 @@ Uninstall: **Settings → Plugins → Installed → Tyhp Language → Uninstall*
 
 ## Packaging acceptance
 
-Run on the machine under test. Primary platform for this story: **macOS**.
+Run on the machine under test. Primary platform: **macOS**.
 
 - [ ] `./gradlew unitTest` exits 0 (unit tests; not a GUI substitute)
-- [ ] `./gradlew buildPlugin` writes `build/distributions/tyhp-lang-0.6.0.zip`
+- [ ] `./gradlew buildPlugin` writes `build/distributions/tyhp-lang-0.7.0.zip`
 - [ ] ZIP contains the plugin JAR / `plugin.xml` with id `com.tyhp.lang`, copied TextMate grammars under `textmate/tyhp/syntaxes/`, and file icons
 - [ ] **Install Plugin from Disk** succeeds **or** the ZIP is built and install is left for a person (note which)
 - [ ] After a GUI install, **Settings → Plugins → Installed** lists **Tyhp Language** (`com.tyhp.lang`)
 - [ ] **No** JetBrains Marketplace upload, **no** `publishPlugin`, **no** Marketplace credentials used
 
-Windows and Linux: same Gradle commands; not required to have been run for Phase 14 if macOS packaging succeeded. Record as follow-ups at the bottom.
+Windows and Linux: same Gradle commands; not required if macOS packaging succeeded. Record as follow-ups at the bottom.
 
 ---
 
@@ -73,11 +73,11 @@ Counterpart of VS Code Phase 2. **Human GUI** unless noted.
 
 - [ ] Opening a `.tyhp` file selects file type **Tyhp** (not PHP)
 - [ ] Opening a `.tyhpdef` file selects file type **Tyhp Definition** (same `Tyhp` language; distinct file type — native difference vs VS Code’s single language id `tyhp`)
-- [ ] Keywords, comments, strings, numbers highlight on `tyhp-lang/vscode/samples/highlight-audit.tyhp` and `highlight-audit.tyhpdef`
+- [ ] Keywords, comments, strings, numbers highlight on `../vscode/samples/highlight-audit.tyhp` and `highlight-audit.tyhpdef`
 - [ ] Markdown fenced `tyhp` / `tyhpdef` blocks highlight when the shipped TextMate injection is active (`samples/highlight-audit.md`). If PhpStorm’s Markdown editor does not apply the injection, note that; the grammar is still copied from the canonical VS Code `syntaxes/` tree
 - [ ] Bracket matching for `{}`, `[]`, `()`, `<>` (`TyhpBraceMatcher` / language configuration)
 - [ ] Comment toggle (macOS `Cmd+/`, Windows/Linux `Ctrl+/`) uses `//` line comments
-- [ ] Distinct Project-view icons for `.tyhp` / `.tyhpdef` (light/dark variants from `tyhp-lang/vscode/media/`)
+- [ ] Distinct Project-view icons for `.tyhp` / `.tyhpdef` (light/dark variants from `../vscode/media/`)
 - [ ] Optional / native difference: PhpStorm does **not** offer a **PHP (Tyhp)** language mode. The shared PHP grammar is included by `source.tyhp`; `fileTypes: ["php"]` is stripped at Gradle copy time so TextMate does not steal `.php` from PhpStorm’s PHP highlighter. Confirm a `.php` file stays **PHP**
 
 TextMate must still highlight if the language server is down (semantic tokens are additive). Optional: **Settings → Editor → TextMate Bundles** lists a **Tyhp** bundle from this plugin.
@@ -156,9 +156,9 @@ VS Code’s “PHP Debug (`xdebug.php-debug`) missing” row maps to PhpStorm’
 
 ## Editor-side LSP feature list
 
-Counterpart of the VS Code Phase 7 table. Story 19 already proves these over stdin/stdout. This list proves them **through the plugin**. All **Human GUI**. Use a small fixture project with `tyhp.json` and a valid `tyhp.path`.
+Same feature list as [`vscode/QA.md`](../vscode/QA.md). The compiler’s `tyhp language_server` already covers these over stdin/stdout. This list proves them **through the plugin**. All **Human GUI**. Use a small fixture project with `tyhp.json` and a valid `tyhp.path`.
 
-Story 19 **does** advertise semantic tokens (full + delta), so include that row.
+The server advertises semantic tokens (full and delta), so include that row.
 
 | Feature | How to check (PhpStorm) | Pass? |
 |---------|-------------------------|-------|
@@ -177,19 +177,19 @@ Story 19 **does** advertise semantic tokens (full + delta), so include that row.
 | Code actions | Intention bulb / `Alt+Enter` (and organize imports if offered) | [ ] |
 | Semantic tokens | With LSP up, semantic highlighting is additive on top of TextMate | [ ] |
 
-Also advertised by Story 19 (optional extra GUI; not required to call Phase 14 “checklist written”): document highlight, folding range, format document, selection range, workspace symbols.
+Optional extra GUI (not required to treat this checklist as written): document highlight, folding range, format document, selection range, workspace symbols.
 
 ---
 
 ## Cursor compatibility
 
-Not this plugin. Cursor sideload of `tyhp-*.vsix` is documented in [`tyhp-lang/vscode/QA.md`](../vscode/QA.md). PhpStorm has no Cursor counterpart row beyond this pointer.
+Not this plugin. Cursor sideload of `tyhp-*.vsix` is documented in [`vscode/QA.md`](../vscode/QA.md). PhpStorm has no Cursor counterpart row beyond this pointer.
 
 ---
 
 ## Windows / Linux follow-ups
 
-Not a Phase 14 blocker when macOS packaging succeeded.
+Not a packaging blocker when macOS packaging succeeded.
 
 - [ ] Windows: `./gradlew unitTest` / `./gradlew buildPlugin` / Install Plugin from Disk
 - [ ] Linux: same
@@ -219,7 +219,7 @@ Every VS Code checklist scenario has a PhpStorm row above. Native UX names:
 
 ## Verified in this environment (do not fake GUI)
 
-Recorded **2026-08-19** on macOS (darwin 25). Phase 14 “signed off” in the story plan means: this checklist exists, `unitTest` works, and a plugin ZIP can be built. It does **not** mean every GUI row above was clicked.
+Recorded **2026-08-19** on macOS (darwin 25). That record means this checklist existed, `unitTest` passed, and a plugin ZIP was built. It does **not** mean every GUI row above was clicked.
 
 | Check | Result |
 |-------|--------|

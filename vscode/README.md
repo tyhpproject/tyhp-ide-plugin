@@ -4,9 +4,9 @@ Syntax highlighting and a Language Server Protocol client for `.tyhp` and `.tyhp
 
 Product: **Tyhp Language** (`tyhp-lang`). Extension ID: `tyhp-lang.tyhp`.
 
-**Marketplace / Open VSX publish is out of scope** for Story 19.5. This extension is installed locally (symlink, copy, or sideload VSIX).
+This extension is installed locally (symlink, copy, or sideload VSIX). Publishing to the VS Code Marketplace or Open VSX is a separate step from building the VSIX.
 
-**Local QA:** the repeatable sideload / packaging / editor checklist is [QA.md](./QA.md) (Story 19.5 Phase 7). It is a human matrix plus notes on what this repo’s unit tests already cover — not a claim that every GUI item was clicked in this environment.
+**Local QA:** the repeatable sideload / packaging / editor checklist is [QA.md](./QA.md). It is a human matrix plus notes on what this repo’s unit tests already cover — not a claim that every GUI item was clicked in this environment.
 
 ## Features
 
@@ -27,7 +27,7 @@ Product: **Tyhp Language** (`tyhp-lang`). Extension ID: `tyhp-lang.tyhp`.
   - Type interpolation in strings (`"${TypeName}"`, `"${A|B}"`, `"${Type+}"`)
 - **File icons** for `.tyhp` and `.tyhpdef` (light/dark language icons; optional **Tyhp File Icons** theme with default/light/high-contrast variants and distinct `.tyhp` vs `.tyhpdef` glyphs)
 - **Tyhp CLI** — find `tyhp` on `PATH`, install from GitHub Releases (global or extension-only), and keep an extension-only binary updated or pinned
-- **Language server** — launches one `tyhp language_server` per owned `tyhp.json` over stdin/stdout using the resolved CLI (at most `tyhp.languageServer.maxSessions`, default 8). A project owns a file when that file matches its `include` / `exclude` globs (same rules as `tyhp build`, including `../` overlays). Servers start when you open an owned file and stop when that project has no open Tyhp documents or is evicted for the cap. Files that match no project stay TextMate-only. Diagnostics, hover, go-to-definition, completion, and the rest of Story 19’s LSP features appear through the standard VS Code Language Client. Logs: Output panel > **Tyhp Language Server**. Trace: `tyhp.languageServer.trace`.
+- **Language server** — launches one `tyhp language_server` per owned `tyhp.json` over stdin/stdout using the resolved CLI (at most `tyhp.languageServer.maxSessions`, default 8). A project owns a file when that file matches its `include` / `exclude` globs (same rules as `tyhp build`, including `../` overlays). Servers start when you open an owned file and stop when that project has no open Tyhp documents or is evicted for the cap. Files that match no project stay TextMate-only. Diagnostics, hover, go-to-definition, completion, and the rest of the language server features appear through the standard VS Code Language Client. Logs: Output panel > **Tyhp Language Server**. Trace: `tyhp.languageServer.trace`.
 - **Workspace** — indexes every `tyhp.json` under the workspace (or the single file forced by `tyhp.projectPath`). The status bar, tasks, and XDebug proxy follow the **active editor’s owner**. Opening a Tyhp file with no owner and no ancestor `tyhp.json` offers **Tyhp: Initialize Project** (`tyhp init --yes`).
 - **Tasks** — `tyhp: build` and `tyhp: lint` run against the resolved CLI and pass `--tyhp-project` when a project file is known. Lint uses `--format=json`.
 - **XDebug proxy** — start/stop `tyhp xdebug_proxy` and contribute a PHP Debug launch snippet that listens on the proxy IDE port so breakpoints can hit `.tyhp` sources. Logs: Output panel > **Tyhp XDebug Proxy**.
@@ -43,7 +43,7 @@ Highlighting QA samples: `samples/highlight-audit.tyhp`, `samples/highlight-audi
 
 The extension has a TypeScript entry point (`src/extension.ts`). Language contributions (TextMate grammars) load from `package.json` regardless; compiling is required so `main` can activate without an error.
 
-From this directory (`tyhp-lang/vscode/`):
+From this directory (`vscode/`):
 
 ```bash
 npm install
@@ -53,7 +53,7 @@ npm test
 
 `npm run package` compiles, then **esbuild-bundles** `src/extension.ts` (including `vscode-languageclient`) into `out/extension.js` so the VSIX does not need `node_modules` at runtime, then runs `npm run check-package` and fails the build if any tsc per-module `out/<folder>/*.js` would be packed. Run `npm run check-package` on its own to re-check an existing build without repackaging.
 
-**F5 (Extension Development Host):** open **this folder** (`tyhp-lang/vscode`) as the workspace in VS Code or Cursor, then press F5. That uses `.vscode/launch.json` (`Run Extension`). The first launch compiles/watches via `.vscode/tasks.json`.
+**F5 (Extension Development Host):** open **this folder** (`vscode/`) as the workspace in VS Code or Cursor, then press F5. That uses `.vscode/launch.json` (`Run Extension`). The first launch compiles/watches via `.vscode/tasks.json`.
 
 To package a local VSIX (does not publish):
 
@@ -68,20 +68,20 @@ npm run package
 
 Changes to the grammar are picked up on each window reload — no reinstall needed. Run `npm install` and `npm run compile` in this folder so `out/extension.js` exists.
 
-**Important:** The symlink target must be an **absolute path** (e.g. `/Users/you/repos/tyhp/tyhp-lang/vscode`). Do not use a relative path like `./tyhp-lang/vscode` — `ln -s` resolves relative targets from the extensions directory, not your current shell directory, which creates a broken self-referential symlink.
+**Important:** The symlink target must be an **absolute path** (e.g. `/Users/you/repos/tyhp-ide-plugin/vscode`). Do not use a relative path like `./vscode` — `ln -s` resolves relative targets from the extensions directory, not your current shell directory, which creates a broken self-referential symlink.
 
-The symlink must also use Cursor/VS Code's expected folder name: `{publisher}.{name}-{version}` (from `package.json`). For this extension that is `tyhp-lang.tyhp-<version>` — currently `tyhp-lang.tyhp-0.8.0`.
+The symlink must also use Cursor/VS Code's expected folder name: `{publisher}.{name}-{version}` (from `package.json`). For this extension that is `tyhp-lang.tyhp-<version>` — currently `tyhp-lang.tyhp-0.8.1`.
 
 If you previously installed as `tyhp-lang.tyhp-language-<version>` (old folder / old `name`) or `tyhp-lang.tyhp-0.7.0` / `0.5.0`, remove that install first.
 
-From the repo root:
+From the clone root ([tyhp-ide-plugin](https://github.com/tyhpproject/tyhp-ide-plugin)):
 
 ```bash
-rm -rf ~/.cursor/extensions/tyhp-lang.tyhp-0.8.0   # Cursor
-ln -s "$(pwd)/tyhp-lang/vscode" ~/.cursor/extensions/tyhp-lang.tyhp-0.8.0
+rm -rf ~/.cursor/extensions/tyhp-lang.tyhp-0.8.1   # Cursor
+ln -s "$(pwd)/vscode" ~/.cursor/extensions/tyhp-lang.tyhp-0.8.1
 
-rm -rf ~/.vscode/extensions/tyhp-lang.tyhp-0.8.0  # VS Code
-ln -s "$(pwd)/tyhp-lang/vscode" ~/.vscode/extensions/tyhp-lang.tyhp-0.8.0
+rm -rf ~/.vscode/extensions/tyhp-lang.tyhp-0.8.1  # VS Code
+ln -s "$(pwd)/vscode" ~/.vscode/extensions/tyhp-lang.tyhp-0.8.1
 ```
 
 Or use an explicit absolute path:
@@ -89,41 +89,41 @@ Or use an explicit absolute path:
 **Cursor:**
 
 ```bash
-rm -rf ~/.cursor/extensions/tyhp-lang.tyhp-0.8.0
-ln -s "/path/to/tyhp/tyhp-lang/vscode" ~/.cursor/extensions/tyhp-lang.tyhp-0.8.0
+rm -rf ~/.cursor/extensions/tyhp-lang.tyhp-0.8.1
+ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.cursor/extensions/tyhp-lang.tyhp-0.8.1
 ```
 
 **VS Code:**
 
 ```bash
-rm -rf ~/.vscode/extensions/tyhp-lang.tyhp-0.8.0
-ln -s "/path/to/tyhp/tyhp-lang/vscode" ~/.vscode/extensions/tyhp-lang.tyhp-0.8.0
+rm -rf ~/.vscode/extensions/tyhp-lang.tyhp-0.8.1
+ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.vscode/extensions/tyhp-lang.tyhp-0.8.1
 ```
 
 Then **fully quit and reopen** Cursor/VS Code (`Cmd+Q`, not just "Reload Window"). If you previously had a broken install, also remove the extension from `~/.cursor/extensions/.obsolete` if it lists `tyhp-lang.tyhp-0.8.0`, `tyhp-lang.tyhp-0.6.0`, `tyhp-lang.tyhp-0.5.0`, `tyhp-lang.tyhp-0.4.0`, `tyhp-lang.tyhp-0.3.1`, or `tyhp-lang.tyhp-language-0.2.1`.
 
 ### Option 2: Sideload a VSIX
 
-Build the VSIX from `tyhp-lang/vscode/` (requires `npm install` once):
+Build the VSIX from `vscode/` (requires `npm install` once):
 
 ```bash
-cd tyhp-lang/vscode
+cd vscode
 npm install
 npm run package
 ```
 
-`vsce package` writes `tyhp-0.8.0.vsix` in this folder. Sideload it — this does **not** publish to the Marketplace:
+`vsce package` writes `tyhp-0.8.1.vsix` in this folder. Sideload it — this does **not** publish to the Marketplace:
 
 **Cursor:**
 
 ```bash
-cursor --install-extension tyhp-0.8.0.vsix
+cursor --install-extension tyhp-0.8.1.vsix
 ```
 
 **VS Code:**
 
 ```bash
-code --install-extension tyhp-0.8.0.vsix
+code --install-extension tyhp-0.8.1.vsix
 ```
 
 You can also use **Install from VSIX…** in the Extensions view (`…` menu).
@@ -136,18 +136,18 @@ npx vsce package
 
 ### Option 3: Copy to extensions directory
 
-Compile first (`npm run compile`), then copy. The folder name must be `tyhp-lang.tyhp-<version>`:
+From the clone root, compile first (`npm run compile` inside `vscode/`), then copy. The folder name must be `tyhp-lang.tyhp-<version>`:
 
 **Cursor:**
 
 ```bash
-cp -r tyhp-lang/vscode ~/.cursor/extensions/tyhp-lang.tyhp-0.8.0
+cp -r vscode ~/.cursor/extensions/tyhp-lang.tyhp-0.8.1
 ```
 
 **VS Code:**
 
 ```bash
-cp -r tyhp-lang/vscode ~/.vscode/extensions/tyhp-lang.tyhp-0.8.0
+cp -r vscode ~/.vscode/extensions/tyhp-lang.tyhp-0.8.1
 ```
 
 Then fully quit and reopen the editor.
@@ -256,13 +256,13 @@ Opening a `.tyhp` / `.tyhpdef` file (language id `tyhp` — there is no separate
 <resolved tyhp> language_server --quiet --stdio --tyhp-project=<path-to-that-project's-tyhp.json>
 ```
 
-A second nested project gets its own process when you open a file it owns. At most `tyhp.languageServer.maxSessions` servers run at once (default **8**); visible editors are started first so a workspace with many `tyhp.json` files (for example `runtime/packages`) cannot spawn one `tyhp` per package. Each client’s document middleware keeps other projects’ files off that server. Files with no owner never start a server (TextMate highlighting still works).
+A second nested project gets its own process when you open a file it owns. At most `tyhp.languageServer.maxSessions` servers run at once (default **8**); visible editors are started first so a workspace with many `tyhp.json` files cannot spawn one `tyhp` per package. Each client’s document middleware keeps other projects’ files off that server. Files with no owner never start a server (TextMate highlighting still works).
 
 `--tyhp-project` is the owner file, or the forced `tyhp.projectPath` when that setting is set. Extra tokens from `tyhp.languageServer.args` are appended after those flags.
 
 If the CLI binary is missing, activation still succeeds. The status bar shows **CLI missing** and **Tyhp: Install / Update CLI** remains available.
 
-If the resolved CLI is too old (Story 19 `language_server` still a stub) or the process exits before initialize completes, the client **does not** retry in a loop. You get one error with **Install / Update CLI**, **Open Settings** (`tyhp.path`), or **Show Output**. Point `tyhp.path` at a current build, then **Tyhp: Restart Language Server**.
+If the resolved CLI is too old (`language_server` is missing) or the process exits before initialize completes, the client **does not** retry in a loop. You get one error with **Install / Update CLI**, **Open Settings** (`tyhp.path`), or **Show Output**. Point `tyhp.path` at a current build, then **Tyhp: Restart Language Server**.
 
 If a healthy server later crashes, the client restarts it with exponential backoff, then stops after a few failures instead of toasting forever. A server that only stays up briefly does **not** reset that counter. Stopping the extension host stops the server (`deactivate` → tracked child SIGTERM/SIGKILL).
 
@@ -270,7 +270,7 @@ Logs and LSP traces go to **Output** > **Tyhp Language Server**. Set `tyhp.langu
 
 ### Debugging `.tyhp` (XDebug proxy)
 
-The extension starts Story 18’s `tyhp xdebug_proxy` so the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) extension (`xdebug.php-debug`) can hit breakpoints in `.tyhp` sources. It does **not** reimplement DBGp and does not replace PHP Debug.
+The extension starts `tyhp xdebug_proxy` so the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) extension (`xdebug.php-debug`) can hit breakpoints in `.tyhp` sources. It does **not** reimplement DBGp and does not replace PHP Debug.
 
 **Prerequisites**
 
@@ -284,7 +284,7 @@ The extension starts Story 18’s `tyhp xdebug_proxy` so the [PHP Debug](https:/
 }
 ```
 
-See [Source map generation](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_sourcemapGeneration.md) and [XDebug proxy](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_xdebugProxy.md).
+See [Source map generation](https://tyhplang.com/cli_sourcemapGeneration.html) and [XDebug proxy](https://tyhplang.com/cli_xdebugProxy.html).
 
 2. Install **PHP Debug** (`xdebug.php-debug`). It is the DBGp client; this extension only launches the proxy and contributes a launch snippet.
 
@@ -332,9 +332,9 @@ Add a PHP Debug configuration that listens on the **proxy IDE port** (default **
 | Symptom | What to do |
 |---------|------------|
 | Proxy will not start / port in use | Stop the proxy from the status bar, or change `tyhp.xdebugProxy.idePort` / `xdebugPort` (or `tyhp.json` `xdebugProxy`). See Output > **Tyhp XDebug Proxy**. |
-| No sourcemaps / breakpoints stay on `.php` | Set `build.generateSourcemap` and rebuild. Docs: [sourcemaps](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_sourcemapGeneration.md). |
+| No sourcemaps / breakpoints stay on `.php` | Set `build.generateSourcemap` and rebuild. Docs: [sourcemaps](https://tyhplang.com/cli_sourcemapGeneration.html). |
 | PHP Debug missing | Install `xdebug.php-debug`. Starting a Tyhp launch config offers that action. |
-| Proxy down when debugging | The launch resolver offers **Start XDebug Proxy**. Docs: [xdebug_proxy](https://github.com/tyhpproject/tyhp/blob/main/docs/content/cli_xdebugProxy.md). |
+| Proxy down when debugging | The launch resolver offers **Start XDebug Proxy**. Docs: [xdebug_proxy](https://tyhplang.com/cli_xdebugProxy.html). |
 
 ### Settings (`tyhp.*`)
 
@@ -359,9 +359,9 @@ Add a PHP Debug configuration that listens on the **proxy IDE port** (default **
 If installed via symlink or copy, remove the folder from the extensions directory:
 
 ```bash
-rm -rf ~/.cursor/extensions/tyhp-lang.tyhp-0.8.0
+rm -rf ~/.cursor/extensions/tyhp-lang.tyhp-0.8.1
 # or
-rm -rf ~/.vscode/extensions/tyhp-lang.tyhp-0.8.0
+rm -rf ~/.vscode/extensions/tyhp-lang.tyhp-0.8.1
 ```
 
 If installed via VSIX:

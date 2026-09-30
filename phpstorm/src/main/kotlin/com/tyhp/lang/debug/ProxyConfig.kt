@@ -3,7 +3,7 @@ package com.tyhp.lang.debug
 /**
  * Argv and port/sourcemap resolution for `tyhp xdebug_proxy`.
  *
- * Flags match `DisplayHelp.XDebugProxyHelp` / `docs/content/cli_xdebugProxy.md`:
+ * Flags match `DisplayHelp.XDebugProxyHelp` / https://tyhplang.com/cli_xdebugProxy.html:
  * `--ide-port`, `--xdebug-port`, `--sourcemap-dir`, `--ide-key`, plus global
  * `--tyhp-project`. Do not invent extra switches.
  *

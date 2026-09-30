@@ -13,7 +13,7 @@ import com.tyhp.lang.workspace.WorkspaceService
  *
  * Startup: binary resolution (Phase 10), LSP client (Phase 11), workspace /
  * init / run configs / status bar (Phase 12), XDebug proxy (Phase 13).
- * TextMate grammars are loaded from `tyhp-lang/vscode/syntaxes/` (canonical
+ * TextMate grammars are loaded from `../vscode/syntaxes/` (canonical
  * source; copied at Gradle build time).
  */
 class TyhpPlugin : ProjectActivity {
