@@ -1,8 +1,8 @@
 # Tyhp Language — VS Code / Cursor QA matrix
 
-Repeatable **local** checklist for `vscode/`. **Do not** publish to the VS Code Marketplace or Open VSX as part of this matrix.
+Repeatable **local** checklist for `vscode/`. **Do not** publish to the Visual Studio Marketplace or Open VSX as part of this matrix. Publish steps for both registries are in [README.md](./README.md#publishing).
 
-Product: **Tyhp Language** (`tyhp-lang`). Extension ID: `tyhp-lang.tyhp`. Artifact: `tyhp-<version>.vsix` (currently `tyhp-0.8.1.vsix`).
+Product: **Tyhp Language** (`tyhp-lang`). Publisher: `Tyhp`. Extension ID: `Tyhp.tyhp`. Artifact: `tyhp-<version>.vsix` (currently `tyhp-0.8.2.vsix`).
 
 Cursor uses the **same VSIX**. There is no separate Cursor product.
 
@@ -36,8 +36,8 @@ npm run package
 Install the VSIX (pick one editor):
 
 ```bash
-code --install-extension tyhp-0.8.1.vsix
-cursor --install-extension tyhp-0.8.1.vsix
+code --install-extension tyhp-0.8.2.vsix
+cursor --install-extension tyhp-0.8.2.vsix
 ```
 
 Or **Extensions** view → `…` → **Install from VSIX…**.
@@ -47,11 +47,11 @@ Development alternative (not a Marketplace path): open `vscode/` as the workspac
 Uninstall:
 
 ```bash
-code --uninstall-extension tyhp-lang.tyhp
-cursor --uninstall-extension tyhp-lang.tyhp
+code --uninstall-extension Tyhp.tyhp
+cursor --uninstall-extension Tyhp.tyhp
 ```
 
-If a **symlink** install already exists (`~/.vscode/extensions/tyhp-lang.tyhp-<version>` or `~/.cursor/extensions/…`), do not blindly `--install-extension` over it — that can replace the symlink with a packed copy. Use F5 or the symlink workflow in the README instead.
+If a **symlink** install already exists (`~/.vscode/extensions/Tyhp.tyhp-<version>` or `~/.cursor/extensions/…`), do not blindly `--install-extension` over it — that can replace the symlink with a packed copy. Use F5 or the symlink workflow in the README instead.
 
 ---
 
@@ -61,12 +61,12 @@ Run on the machine under test. Primary platform: **macOS**.
 
 - [ ] `npm run compile` exits 0
 - [ ] `npm test` exits 0 (unit tests; not a GUI substitute)
-- [ ] `npm run package` writes `tyhp-0.8.1.vsix` (version from `package.json`) and (via the built-in `check-package` step) fails if `out/` would ship anything besides `extension.js`
+- [ ] `npm run package` writes `tyhp-0.8.2.vsix` (version from `package.json`) and (via the built-in `check-package` step) fails if `out/` would ship anything besides `extension.js`
 - [ ] `npm run check-package` (`vsce ls`) on its own also confirms `out/extension.js` and no other `out/` files, without repackaging
 - [ ] VSIX contains `out/extension.js` (esbuild bundle) and does **not** contain any other `out/` file — no `out/binary/`, `out/config/`, `out/debug/`, `out/lsp/`, `out/status/`, `out/tasks/`, `out/workspace/`, or any future `out/<folder>/` that `tsc` writes
-- [ ] `code --install-extension tyhp-0.8.1.vsix` succeeds **or** Install from VSIX works, **or** the `code` CLI is missing and install is manual (note which)
-- [ ] Cursor: `cursor --install-extension tyhp-0.8.1.vsix` **or** Install from VSIX, same VSIX (compatibility only)
-- [ ] After install, `code --list-extensions` / `cursor --list-extensions` includes `tyhp-lang.tyhp` (CLI proof only)
+- [ ] `code --install-extension tyhp-0.8.2.vsix` succeeds **or** Install from VSIX works, **or** the `code` CLI is missing and install is manual (note which)
+- [ ] Cursor: `cursor --install-extension tyhp-0.8.2.vsix` **or** Install from VSIX, same VSIX (compatibility only)
+- [ ] After install, `code --list-extensions` / `cursor --list-extensions` includes `Tyhp.tyhp` (CLI proof only)
 - [ ] **No** `vsce publish`, **no** Open VSX upload, **no** Marketplace submission
 
 Windows and Linux: same commands; not required if macOS packaging succeeded. Record as follow-ups at the bottom.
@@ -189,7 +189,7 @@ Optional extra GUI (not required to treat this checklist as written): document h
 
 ## Cursor compatibility (same VSIX)
 
-Not a second product. After sideloading `tyhp-0.8.1.vsix` in Cursor:
+Not a second product. After sideloading `tyhp-0.8.2.vsix` in Cursor:
 
 - [ ] `.tyhp` opens as language **Tyhp**
 - [ ] Output **Tyhp Language Server** shows the client attached (same as VS Code)
@@ -224,6 +224,6 @@ Recorded **2026-08-19** on macOS (darwin 25). Phase 7 “signed off” in the st
 | Marketplace / Open VSX publish | **Not performed** |
 | Human GUI (language mode, highlighting, Output/LSP attach, hover, diagnostics, init prompt, tasks UI, live XDebug hit, nested `runtime/packages/core` LSP) | **Not run.** A person still needs F5 or a reload after VSIX/symlink install to confirm language mode + per-project LSP attach. |
 
-**Cursor leftovers (not this VSIX):** `tyhp-lang.tyhp-0.3.0` (older same-id folder) and `tyhp-lang.tyhp-language` 0.2.0 / 0.2.1 (former extension `name`, symlinks to `tyhp-vscode`). Disable/remove those if they steal `.tyhp` or confuse the status bar.
+**Cursor leftovers (not this VSIX):** `tyhp-lang.tyhp-0.3.0` (older publisher folder) and `tyhp-lang.tyhp-language` 0.2.0 / 0.2.1 (former extension `name`, symlinks to `tyhp-vscode`). Disable/remove those if they steal `.tyhp` or confuse the status bar.
 
 Unit tests are helpers for Phases 3–6 policy, glob membership, and argv. They do not start VS Code, do not spawn `tyhp language_server`, and do not prove hover or breakpoints.

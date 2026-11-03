@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { InstallMode } from "../config/settingsCore";
 
-export const EXTENSION_ID = "tyhp-lang.tyhp";
+export const EXTENSION_ID = "Tyhp.tyhp";
 
 export interface InstallMetadata {
     installedBy: string;

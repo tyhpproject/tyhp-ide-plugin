@@ -1,0 +1,32 @@
+---
+description: Add root and client CHANGELOG lines with each visible change; review the entries in commits the user asks for and when releasing a client
+alwaysApply: true
+---
+
+# Changelogs
+
+Three changelogs, each covering this repo only (compiler and language server changes belong in `tyhp`):
+
+- `vscode/CHANGELOG.md` — VS Code / Cursor extension release notes. `vsce package` packs it into the VSIX, and the Marketplace and Open VSX show it as the Changelog tab. `## X.Y.Z` headings with plain bullets.
+- `phpstorm/CHANGELOG.md` — PhpStorm plugin release notes. Not packed into the plugin ZIP. Same format.
+- `CHANGELOG.md` — repo-wide changes outside one client (layout, CI, shared contributor docs), plus one line per client release. Keep a Changelog groups.
+
+## When you make a change
+
+Add the line as part of the same change, before you report the work done:
+
+- Client-visible changes go in that client's changelog under `## Unreleased` at the top (add it if missing), one bullet per change, in the existing style. Grammars and icons under `vscode/syntaxes/` and `vscode/media/` also ship in the PhpStorm plugin; log them in both.
+- Repo-wide changes visible to users or maintainers go under `## [Unreleased]` in the root `CHANGELOG.md`, in `### Added`, `### Changed`, `### Deprecated`, `### Removed`, `### Fixed`, or `### Security`.
+- Tests and refactors with no behavior change may be left out.
+- Editing a changelog is a normal file edit and needs no commit. Re-read it right before editing, since other agents may be adding entries.
+
+## When the user asks you to commit
+
+- Review the `Unreleased` entries in all three changelogs against the diff being committed rather than writing them from scratch: add lines for changes that have none, and condense or correct lines the diff no longer matches. Keep entries for other in-progress work.
+- Include the CHANGELOG edits in the commit the user asked for. Never commit just to update them.
+
+## When the user asks you to release a client
+
+- VS Code: before `npm run package` in `vscode/`, rename `## Unreleased` in `vscode/CHANGELOG.md` to the `package.json` `version`, so the VSIX passed to `npx vsce publish --packagePath …` and `npx ovsx publish …` carries those notes.
+- PhpStorm: before `./gradlew buildPlugin` for a release, rename `## Unreleased` in `phpstorm/CHANGELOG.md` to `pluginVersion` from `gradle.properties`.
+- Root: move `[Unreleased]` entries under `## [vscode X.Y.Z] - YYYY-MM-DD` or `## [phpstorm X.Y.Z] - YYYY-MM-DD`, with a line pointing to that client's changelog.

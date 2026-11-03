@@ -4,7 +4,7 @@ import { isExtensionOwnedInstall, InstallMetadata } from "./metadata";
 import { planAutoUpdate } from "./UpdateService";
 
 const owned: InstallMetadata = {
-    installedBy: "tyhp-lang.tyhp",
+    installedBy: "Tyhp.tyhp",
     version: "v805.0.0-alpha.1",
     mode: "extension",
     assetName: "tyhp-osx-arm64",

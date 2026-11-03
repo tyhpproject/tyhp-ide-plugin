@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.2
+
+- Extension icon for the Marketplace and the Extensions view
+- Publisher id is `Tyhp.tyhp`
+- README covers how to publish the VSIX to the Marketplace and Open VSX
+
 ## 0.8.1
 
 - Stop leaking `tyhp` processes: spawn the language server ourselves (`detached: false`), reap it on stop/crash (SIGTERM then SIGKILL via Node `ChildProcess.kill`), and serialize start/stop/restart so a second spawn cannot overlap an unfinished stop

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Extension icon, copied from the VS Code extension media when the plugin is built
+
 ## 0.7.0
 
 - One language server per owned `tyhp.json`, started lazily when a matching `.tyhp` / `.tyhpdef` file is opened

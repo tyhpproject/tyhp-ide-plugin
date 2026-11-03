@@ -105,7 +105,7 @@ The plugin locates a `tyhp` executable and records it in `tyhp.path` (**Settings
 
 After a successful install, `tyhp.path` and `tyhp.binary.installMode` (`path` \| `global` \| `extension`) are updated. The settings value remains `extension` for plugin-only (same as VS Code).
 
-`tyhp.binary.pinnedVersion` (plugin-only): if non-empty, install/keep that GitHub tag and do **not** auto-update to other versions. Tags may omit the leading `v` (`805.1.0-beta.1` = `v805.1.0-beta.1`).
+`tyhp.binary.pinnedVersion` (plugin-only): if non-empty, install/keep that GitHub tag and do **not** auto-update to other versions. Tags may omit the leading `v` (`805.1.2-beta.3` = `v805.1.2-beta.3`).
 
 Startup auto-update is delayed ~5s and skipped when a check ran in the last 6 hours (pin enforcement still runs). A stale `installMode=extension` with a hand-edited `tyhp.path` that no longer points at the plugin-managed file is **not** auto-updated.
 

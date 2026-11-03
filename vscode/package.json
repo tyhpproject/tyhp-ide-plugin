@@ -2,8 +2,9 @@
     "name": "tyhp",
     "displayName": "Tyhp Language",
     "description": "Tyhp language support: syntax highlighting, LSP, XDebug proxy debugging, tasks, workspace init, status bar, file icons, and CLI binary management for .tyhp / .tyhpdef",
-    "version": "0.8.1",
-    "publisher": "tyhp-lang",
+    "version": "0.8.2",
+    "publisher": "Tyhp",
+    "icon": "media/icon.png",
     "license": "Apache-2.0",
     "repository": {
         "type": "git",

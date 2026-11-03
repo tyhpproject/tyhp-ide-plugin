@@ -10,7 +10,7 @@ Licensed under the [Apache License 2.0](LICENSE.txt).
 
 | Path | What it is |
 |------|-----------|
-| `vscode/` | VS Code / Cursor extension (`tyhp-lang.tyhp`). Canonical TextMate grammars and file icons. |
+| `vscode/` | VS Code / Cursor extension (`Tyhp.tyhp`). Canonical TextMate grammars and file icons. |
 | `phpstorm/` | PhpStorm plugin (`com.tyhp.lang`). Gradle copies grammars and icons from `../vscode` at build time. |
 
 `vscode/` and `phpstorm/` are siblings. Keep that layout so the PhpStorm build can resolve `../vscode`.
@@ -32,9 +32,9 @@ npm test
 npm run package
 ```
 
-`npm test` compiles TypeScript and runs the unit tests. `npm run package` writes a local VSIX. It does not publish to the Marketplace or Open VSX.
+`npm test` compiles TypeScript and runs the unit tests. `npm run package` writes a local VSIX. Publish that VSIX to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Tyhp.tyhp) and to [Open VSX](https://open-vsx.org/extension/Tyhp/tyhp).
 
-Install steps are in [`vscode/README.md`](vscode/README.md).
+Install and publish steps are in [`vscode/README.md`](vscode/README.md).
 
 ## PhpStorm
 
