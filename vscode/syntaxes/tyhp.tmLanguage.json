@@ -5,9 +5,18 @@
   "fileTypes": ["tyhp", "tyhpdef"],
   "patterns": [
     { "include": "#tyhp-open-tag" },
+    { "include": "#tyhp-echo-tag" },
     { "include": "#tyhp-tagless-root" },
-    { "include": "#inline-html" }
+    { "include": "#html-template" }
   ],
+  "injections": {
+    "L:text.html.basic": {
+      "patterns": [
+        { "include": "#tyhp-echo-tag" },
+        { "include": "#tyhp-open-tag" }
+      ]
+    }
+  },
   "repository": {
     "tyhp-open-tag": {
       "begin": "(^\\s*)(<\\?)(tyhpdef|tyhp)\\b",
@@ -24,16 +33,32 @@
         { "include": "#tyhp-code-body" }
       ]
     },
+    "tyhp-echo-tag": {
+      "begin": "(<\\?=)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.section.embedded.begin.tyhp" }
+      },
+      "end": "(\\?>)",
+      "endCaptures": {
+        "1": { "name": "punctuation.section.embedded.end.tyhp" }
+      },
+      "contentName": "meta.embedded.block.tyhp",
+      "patterns": [
+        { "include": "#tyhp-code-body" }
+      ]
+    },
     "tyhp-tagless-root": {
       "name": "meta.embedded.block.tyhp",
-      "begin": "\\A(?!\\s*<\\?(tyhpdef|tyhp|php)\\b)",
+      "begin": "\\A(?!\\s*<)",
       "end": "\\z",
       "patterns": [
         { "include": "#tyhp-code-body" }
       ]
     },
-    "inline-html": {
-      "match": "[\\s\\S]"
+    "html-template": {
+      "patterns": [
+        { "include": "text.html.basic" }
+      ]
     },
     "tyhp-code-body": {
       "patterns": [

@@ -7,6 +7,7 @@ Notable repository-wide changes to the Tyhp IDE plugins, plus one line per clien
 ### Changed
 
 - VS Code extension 0.8.2 uses publisher `Tyhp` (`Tyhp.tyhp`) and an extension icon. See [vscode/CHANGELOG.md](vscode/CHANGELOG.md).
+- The shared TextMate grammar highlights HTML outside `<?tyhp` blocks and Tyhp inside `<?=`. PhpStorm packages that grammar. See [vscode/CHANGELOG.md](vscode/CHANGELOG.md) and [phpstorm/CHANGELOG.md](phpstorm/CHANGELOG.md).
 
 ## Baseline - 2026-09-30
 

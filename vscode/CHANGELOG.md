@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- HTML outside `<?tyhp` blocks is highlighted as HTML, and `<?= … ?>` is highlighted as Tyhp
+
 ## 0.8.2
 
 - Extension icon for the Marketplace and the Extensions view
