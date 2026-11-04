@@ -2,7 +2,7 @@
     "name": "tyhp",
     "displayName": "Tyhp Language",
     "description": "Tyhp language support: syntax highlighting, LSP, XDebug proxy debugging, tasks, workspace init, status bar, file icons, and CLI binary management for .tyhp / .tyhpdef",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "publisher": "Tyhp",
     "icon": "media/icon.png",
     "license": "Apache-2.0",
@@ -227,7 +227,9 @@
             {
                 "scopeName": "markdown.tyhp.codeblock",
                 "path": "./syntaxes/tyhp-markdown.tmLanguage.json",
-                "injectTo": ["text.html.markdown"],
+                "injectTo": [
+                    "text.html.markdown"
+                ],
                 "embeddedLanguages": {
                     "meta.embedded.block.tyhp": "tyhp",
                     "meta.embedded.block.php-tyhp": "php-tyhp"
@@ -252,11 +254,16 @@
         "taskDefinitions": [
             {
                 "type": "tyhp",
-                "required": ["action"],
+                "required": [
+                    "action"
+                ],
                 "properties": {
                     "action": {
                         "type": "string",
-                        "enum": ["build", "lint"],
+                        "enum": [
+                            "build",
+                            "lint"
+                        ],
                         "description": "Tyhp CLI action (`build` or `lint`)"
                     }
                 }
@@ -266,7 +273,10 @@
             {
                 "name": "tyhp",
                 "owner": "tyhp",
-                "fileLocation": ["relative", "${workspaceFolder}"],
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
                 "pattern": {
                     "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+TYHP(\\d+):\\s+(.*)$",
                     "file": 1,
@@ -281,7 +291,10 @@
         "debuggers": [
             {
                 "type": "php",
-                "languages": ["tyhp", "php"],
+                "languages": [
+                    "tyhp",
+                    "php"
+                ],
                 "configurationSnippets": [
                     {
                         "label": "Tyhp: Listen for XDebug (via proxy)",

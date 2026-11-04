@@ -70,18 +70,18 @@ Changes to the grammar are picked up on each window reload — no reinstall need
 
 **Important:** The symlink target must be an **absolute path** (e.g. `/Users/you/repos/tyhp-ide-plugin/vscode`). Do not use a relative path like `./vscode` — `ln -s` resolves relative targets from the extensions directory, not your current shell directory, which creates a broken self-referential symlink.
 
-The symlink must also use Cursor/VS Code's expected folder name: `{publisher}.{name}-{version}` (from `package.json`). For this extension that is `Tyhp.tyhp-<version>` — currently `Tyhp.tyhp-0.8.2`.
+The symlink must also use Cursor/VS Code's expected folder name: `{publisher}.{name}-{version}` (from `package.json`). For this extension that is `Tyhp.tyhp-<version>` — currently `Tyhp.tyhp-0.8.3`.
 
 If you previously installed as `tyhp-lang.tyhp-language-<version>` (old folder / old `name`) or `tyhp-lang.tyhp-0.8.1` / `0.7.0` / `0.5.0`, remove that install first.
 
 From the clone root ([tyhp-ide-plugin](https://github.com/tyhpproject/tyhp-ide-plugin)):
 
 ```bash
-rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.2   # Cursor
-ln -s "$(pwd)/vscode" ~/.cursor/extensions/Tyhp.tyhp-0.8.2
+rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.3   # Cursor
+ln -s "$(pwd)/vscode" ~/.cursor/extensions/Tyhp.tyhp-0.8.3
 
-rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.2  # VS Code
-ln -s "$(pwd)/vscode" ~/.vscode/extensions/Tyhp.tyhp-0.8.2
+rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.3  # VS Code
+ln -s "$(pwd)/vscode" ~/.vscode/extensions/Tyhp.tyhp-0.8.3
 ```
 
 Or use an explicit absolute path:
@@ -89,15 +89,15 @@ Or use an explicit absolute path:
 **Cursor:**
 
 ```bash
-rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.2
-ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.cursor/extensions/Tyhp.tyhp-0.8.2
+rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.3
+ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.cursor/extensions/Tyhp.tyhp-0.8.3
 ```
 
 **VS Code:**
 
 ```bash
-rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.2
-ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.vscode/extensions/Tyhp.tyhp-0.8.2
+rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.3
+ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.vscode/extensions/Tyhp.tyhp-0.8.3
 ```
 
 Then **fully quit and reopen** Cursor/VS Code (`Cmd+Q`, not just "Reload Window"). If you previously had a broken install, also remove the extension from `~/.cursor/extensions/.obsolete` if it lists `tyhp-lang.tyhp-0.8.1`, `tyhp-lang.tyhp-0.8.0`, `tyhp-lang.tyhp-0.6.0`, `tyhp-lang.tyhp-0.5.0`, `tyhp-lang.tyhp-0.4.0`, `tyhp-lang.tyhp-0.3.1`, or `tyhp-lang.tyhp-language-0.2.1`.
@@ -112,18 +112,18 @@ npm install
 npm run package
 ```
 
-`vsce package` writes `tyhp-0.8.2.vsix` in this folder. Sideload that file locally. Publishing it is a separate step; see [Publishing](#publishing).
+`vsce package` writes `tyhp-0.8.3.vsix` in this folder. Sideload that file locally. Publishing it is a separate step; see [Publishing](#publishing).
 
 **Cursor:**
 
 ```bash
-cursor --install-extension tyhp-0.8.2.vsix
+cursor --install-extension tyhp-0.8.3.vsix
 ```
 
 **VS Code:**
 
 ```bash
-code --install-extension tyhp-0.8.2.vsix
+code --install-extension tyhp-0.8.3.vsix
 ```
 
 You can also use **Install from VSIX…** in the Extensions view (`…` menu).
@@ -141,20 +141,20 @@ From the clone root, compile first (`npm run compile` inside `vscode/`), then co
 **Cursor:**
 
 ```bash
-cp -r vscode ~/.cursor/extensions/Tyhp.tyhp-0.8.2
+cp -r vscode ~/.cursor/extensions/Tyhp.tyhp-0.8.3
 ```
 
 **VS Code:**
 
 ```bash
-cp -r vscode ~/.vscode/extensions/Tyhp.tyhp-0.8.2
+cp -r vscode ~/.vscode/extensions/Tyhp.tyhp-0.8.3
 ```
 
 Then fully quit and reopen the editor.
 
 ## Publishing
 
-Build once with `npm run package`, then upload that VSIX to both registries. The filename follows `package.json` `version` (currently `tyhp-0.8.2.vsix`). Leave the version argument off `vsce publish`: passing `patch`, `minor`, `major`, or a version string runs `npm version` and creates a git commit and tag.
+Build once with `npm run package`, then upload that VSIX to both registries. The filename follows `package.json` `version` (currently `tyhp-0.8.3.vsix`). Leave the version argument off `vsce publish`: passing `patch`, `minor`, `major`, or a version string runs `npm version` and creates a git commit and tag.
 
 From `vscode/`:
 
@@ -169,10 +169,10 @@ VS Code installs from [marketplace.visualstudio.com](https://marketplace.visuals
 Create an Azure DevOps personal access token with organization **All accessible organizations** and scope **Marketplace (Manage)**. Pass it as `VSCE_PAT`, or store it once with `npx vsce login Tyhp`. Full token and publisher setup: [Publishing Extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension).
 
 ```bash
-npx vsce publish --packagePath tyhp-0.8.2.vsix
+npx vsce publish --packagePath tyhp-0.8.3.vsix
 ```
 
-Azure DevOps global personal access tokens are retired on 2026-12-01. After that, publish with Microsoft Entra ID: `npx vsce publish --packagePath tyhp-0.8.2.vsix --azure-credential`.
+Azure DevOps global personal access tokens are retired on 2026-12-01. After that, publish with Microsoft Entra ID: `npx vsce publish --packagePath tyhp-0.8.3.vsix --azure-credential`.
 
 You can also upload the VSIX on the [publisher management page](https://marketplace.visualstudio.com/manage).
 
@@ -189,7 +189,7 @@ npx ovsx create-namespace Tyhp
 Publish the same VSIX:
 
 ```bash
-npx ovsx publish tyhp-0.8.2.vsix
+npx ovsx publish tyhp-0.8.3.vsix
 ```
 
 `ovsx` is not an npm dependency of this package; `npx` downloads it. Details: [Publishing Extensions](https://github.com/eclipse-openvsx/openvsx/wiki/Publishing-Extensions) (Open VSX).
@@ -401,9 +401,9 @@ Add a PHP Debug configuration that listens on the **proxy IDE port** (default **
 If installed via symlink or copy, remove the folder from the extensions directory:
 
 ```bash
-rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.2
+rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.3
 # or
-rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.2
+rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.3
 ```
 
 If installed via VSIX:
