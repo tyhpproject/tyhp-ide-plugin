@@ -4,6 +4,7 @@
 
 - Extension icon, copied from the VS Code extension media when the plugin is built
 - HTML outside `<?tyhp` blocks is highlighted as HTML, and `<?= … ?>` is highlighted as Tyhp
+- README example of a pinned compiler tag is `805.1.2-beta.4`
 
 ## 0.7.0
 

@@ -3,6 +3,7 @@
 ## Unreleased
 
 - HTML outside `<?tyhp` blocks is highlighted as HTML, and `<?= … ?>` is highlighted as Tyhp
+- README example of a pinned compiler tag is `805.1.2-beta.4`
 
 ## 0.8.2
 

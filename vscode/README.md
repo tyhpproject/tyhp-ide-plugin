@@ -214,7 +214,7 @@ The extension locates a `tyhp` executable and records it in `tyhp.path`. The lan
 
 After a successful install, `tyhp.path` and `tyhp.binary.installMode` (`path` \| `global` \| `extension`) are updated.
 
-`tyhp.binary.pinnedVersion` (extension-only): if non-empty, install/keep that GitHub tag and do **not** auto-update to other versions. Tags may omit the leading `v` (`805.1.2-beta.3` = `v805.1.2-beta.3`).
+`tyhp.binary.pinnedVersion` (extension-only): if non-empty, install/keep that GitHub tag and do **not** auto-update to other versions. Tags may omit the leading `v` (`805.1.2-beta.4` = `v805.1.2-beta.4`).
 
 Startup auto-update is delayed ~5s and skipped when a check ran in the last 6 hours (pin enforcement still runs).
 
