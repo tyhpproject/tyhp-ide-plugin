@@ -2,7 +2,7 @@
 
 Repeatable **local** checklist for `phpstorm/`. **Do not** publish to the JetBrains Marketplace as part of this matrix.
 
-Product: **Tyhp Language** (`tyhp-lang`). Plugin ID: `com.tyhp.lang`. Artifact: `tyhp-lang-<version>.zip` (currently `tyhp-lang-0.7.0.zip`).
+Product: **Tyhp Language** (`tyhp-lang`). Plugin ID: `com.tyhp.lang`. Artifact: `tyhp-lang-<version>.zip` (currently `tyhp-lang-0.7.1.zip`).
 
 This file is the **parity counterpart** of [`vscode/QA.md`](../vscode/QA.md). Same scenarios (TextMate, PATH / plugin-only binary, LSP, init, run configs, proxy, ZIP sideload, editor-side LSP feature list). Native PhpStorm UX — not a copy of VS Code menus.
 
@@ -32,7 +32,7 @@ From `phpstorm/`:
 # equivalent: ./package.sh
 ```
 
-The task writes `build/distributions/tyhp-lang-0.7.0.zip` (version from `gradle.properties` `pluginVersion`).
+The task writes `build/distributions/tyhp-lang-0.7.1.zip` (version from `gradle.properties` `pluginVersion`).
 
 ### Install Plugin from Disk
 
@@ -41,7 +41,7 @@ A headless agent cannot easily complete this. A person should:
 1. Open **PhpStorm 2026.2+** (minimum `since-build` `262`). IntelliJ IDEA is not a supported target.
 2. **Settings → Plugins**.
 3. Gear icon (⚙) next to the Plugins heading → **Install Plugin from Disk…**
-4. Select `phpstorm/build/distributions/tyhp-lang-0.7.0.zip`.
+4. Select `phpstorm/build/distributions/tyhp-lang-0.7.1.zip`.
 5. Restart PhpStorm when prompted.
 
 This sideload path does not use JetBrains Marketplace credentials. There is no supported `phpstorm --install-plugin` equivalent in this matrix.
@@ -57,7 +57,7 @@ Uninstall: **Settings → Plugins → Installed → Tyhp Language → Uninstall*
 Run on the machine under test. Primary platform: **macOS**.
 
 - [ ] `./gradlew unitTest` exits 0 (unit tests; not a GUI substitute)
-- [ ] `./gradlew buildPlugin` writes `build/distributions/tyhp-lang-0.7.0.zip`
+- [ ] `./gradlew buildPlugin` writes `build/distributions/tyhp-lang-0.7.1.zip`
 - [ ] ZIP contains the plugin JAR / `plugin.xml` with id `com.tyhp.lang`, copied TextMate grammars under `textmate/tyhp/syntaxes/`, and file icons
 - [ ] **Install Plugin from Disk** succeeds **or** the ZIP is built and install is left for a person (note which)
 - [ ] After a GUI install, **Settings → Plugins → Installed** lists **Tyhp Language** (`com.tyhp.lang`)

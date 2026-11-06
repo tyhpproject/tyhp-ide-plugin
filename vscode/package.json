@@ -1,8 +1,8 @@
 {
     "name": "tyhp",
     "displayName": "Tyhp Language",
-    "description": "Tyhp language support: syntax highlighting, LSP, XDebug proxy debugging, tasks, workspace init, status bar, file icons, and CLI binary management for .tyhp / .tyhpdef",
-    "version": "0.8.3",
+    "description": "Tyhp support for .tyhp and .tyhpdef files: syntax highlighting, language server, build and lint tasks, XDebug debugging, and Tyhp CLI management.",
+    "version": "0.8.4",
     "publisher": "Tyhp",
     "icon": "media/icon.png",
     "license": "Apache-2.0",
@@ -104,7 +104,7 @@
                 "tyhp.path": {
                     "type": "string",
                     "default": "",
-                    "markdownDescription": "Path to the `tyhp` CLI (absolute path or command name). When empty, the extension searches `PATH` and writes the resolved location here. Later phases (language server, tasks, XDebug proxy) use this resolved binary."
+                    "markdownDescription": "Path to the `tyhp` CLI (absolute path or command name). When empty, the extension searches `PATH` and writes the resolved location here. The language server, tasks, and XDebug proxy use this binary."
                 },
                 "tyhp.projectPath": {
                     "type": "string",

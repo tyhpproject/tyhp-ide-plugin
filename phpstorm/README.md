@@ -12,7 +12,7 @@ Minimum IDE: **PhpStorm 2026.2** (`since-build` `262`). That baseline includes t
 
 ## Features
 
-This 0.7.0 build starts **one language server per owned `tyhp.json`** (include/exclude membership, lazy start) and keeps XDebug-proxy debug, `tyhp init`, build/lint run configurations, a status bar, languages, TextMate highlighting, file icons, and CLI binary resolution:
+This 0.7.1 build starts **one language server per owned `tyhp.json`** (include/exclude membership, lazy start) and keeps XDebug-proxy debug, `tyhp init`, build/lint run configurations, a status bar, languages, TextMate highlighting, file icons, and CLI binary resolution:
 
 - **File types:** `.tyhp` → **Tyhp**, `.tyhpdef` → **Tyhp Definition**. A file-type overrider keeps PhpStorm’s PHP highlighter from claiming `<?tyhp` files.
 - **TextMate highlighting** from the canonical grammars in `../vscode/syntaxes/` (copied into the plugin at Gradle build time; not forked). Works without the language server.
@@ -66,7 +66,7 @@ cd phpstorm
 ./gradlew buildPlugin
 ```
 
-The task writes `build/distributions/tyhp-lang-<version>.zip` (currently `tyhp-lang-0.7.0.zip`, from `gradle.properties` `pluginVersion`). The ZIP includes copied grammars under `textmate/tyhp/syntaxes/` and file icons inside the plugin JAR (`icons/`).
+The task writes `build/distributions/tyhp-lang-<version>.zip` (currently `tyhp-lang-0.7.1.zip`, from `gradle.properties` `pluginVersion`). The ZIP includes copied grammars under `textmate/tyhp/syntaxes/` and file icons inside the plugin JAR (`icons/`).
 
 Equivalent helper:
 
@@ -80,7 +80,7 @@ Equivalent helper:
 2. In PhpStorm 2026.2+, open **Settings → Plugins**.
 3. Click the gear icon (⚙) next to the Plugins heading / installed-plugin search.
 4. Choose **Install Plugin from Disk…**
-5. Select `phpstorm/build/distributions/tyhp-lang-0.7.0.zip`.
+5. Select `phpstorm/build/distributions/tyhp-lang-0.7.1.zip`.
 6. Restart PhpStorm when prompted.
 
 This sideload path does not use JetBrains Marketplace credentials.

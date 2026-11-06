@@ -764,6 +764,10 @@
           "name": "keyword.control.using.tyhp"
         },
         {
+          "match": "\\b(?i:lazy)\\b(?=\\s+(?i:new)\\b)",
+          "name": "keyword.control.lazy.tyhp"
+        },
+        {
           "match": "\\b(?i:with)\\b",
           "name": "keyword.operator.with.tyhp"
         },

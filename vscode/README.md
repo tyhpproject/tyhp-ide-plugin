@@ -1,415 +1,99 @@
-# Tyhp Language Support for VS Code / Cursor
+# Tyhp Language
 
-Syntax highlighting and a Language Server Protocol client for `.tyhp` and `.tyhpdef` files, plus a standalone PHP grammar, **Tyhp CLI** discovery / install, workspace/`tyhp.json` awareness, build/lint tasks, XDebug proxy debugging, and a status bar.
+Editor support for [Tyhp](https://tyhplang.com) `.tyhp` and `.tyhpdef` files in VS Code and Cursor: syntax highlighting, language server features, build and lint tasks, and breakpoints in `.tyhp` sources through XDebug.
 
-Product: **Tyhp Language** (`tyhp-lang`). Publisher: `Tyhp`. Extension ID: `Tyhp.tyhp`.
-
-This extension is installed locally (symlink, copy, or sideload VSIX). Publish that same VSIX to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Tyhp.tyhp) (VS Code) and to [Open VSX](https://open-vsx.org/extension/Tyhp/tyhp) (Cursor). See [Publishing](#publishing).
-
-**Local QA:** the repeatable sideload / packaging / editor checklist is [QA.md](./QA.md). It is a human matrix plus notes on what this repo’s unit tests already cover — not a claim that every GUI item was clicked in this environment.
+To learn the language itself, see [tyhplang.com](https://tyhplang.com).
 
 ## Features
 
-- **Tyhp language** (`source.tyhp`) — full standalone grammar for `.tyhp` and `.tyhpdef` files:
-  - Optional `<?tyhp` / `<?tyhpdef` open tags (tagless files highlight as Tyhp code from line 1)
-  - Classic mode with open/close tags for inline HTML interleaving
-  - `async` / `await`
-  - `struct`, `extension`, `type` alias declarations
-  - `operator` overload declarations (arithmetic, comparison, conversion)
-  - `using` blocks and `:=` using-assignment
-  - `is` type checks
-  - `typeof`, `nameof`, `variable_exists` expressions
-  - `deprecated`, `obsolete` modifiers
-  - `decimal` type and `(decimal)` cast
-  - `with` keyword
-  - Generic type parameters (`<T>`, `<T extends Type>`, nested generics)
-  - Constructor delegation (`: parent(...)`, `: void`)
-  - Type interpolation in strings (`"${TypeName}"`, `"${A|B}"`, `"${Type+}"`)
-- **File icons** for `.tyhp` and `.tyhpdef` (light/dark language icons; optional **Tyhp File Icons** theme with default/light/high-contrast variants and distinct `.tyhp` vs `.tyhpdef` glyphs)
-- **Tyhp CLI** — find `tyhp` on `PATH`, install from GitHub Releases (global or extension-only), and keep an extension-only binary updated or pinned
-- **Language server** — launches one `tyhp language_server` per owned `tyhp.json` over stdin/stdout using the resolved CLI (at most `tyhp.languageServer.maxSessions`, default 8). A project owns a file when that file matches its `include` / `exclude` globs (same rules as `tyhp build`, including `../` overlays). Servers start when you open an owned file and stop when that project has no open Tyhp documents or is evicted for the cap. Files that match no project stay TextMate-only. Diagnostics, hover, go-to-definition, completion, and the rest of the language server features appear through the standard VS Code Language Client. Logs: Output panel > **Tyhp Language Server**. Trace: `tyhp.languageServer.trace`.
-- **Workspace** — indexes every `tyhp.json` under the workspace (or the single file forced by `tyhp.projectPath`). The status bar, tasks, and XDebug proxy follow the **active editor’s owner**. Opening a Tyhp file with no owner and no ancestor `tyhp.json` offers **Tyhp: Initialize Project** (`tyhp init --yes`).
-- **Tasks** — `tyhp: build` and `tyhp: lint` run against the resolved CLI and pass `--tyhp-project` when a project file is known. Lint uses `--format=json`.
-- **XDebug proxy** — start/stop `tyhp xdebug_proxy` and contribute a PHP Debug launch snippet that listens on the proxy IDE port so breakpoints can hit `.tyhp` sources. Logs: Output panel > **Tyhp XDebug Proxy**.
-- **Status bar** — compact project + LSP + CLI health + XDebug proxy listening state. Click for Restart Language Server, Install CLI, Initialize Project, and Start/Stop/Restart XDebug Proxy.
-- **PHP (Tyhp)** (`source.tyhp.php`) — full standalone PHP grammar, manually selectable for `.php` files
-- Comment toggling, bracket matching (`{}`, `[]`, `()`, `<>`), auto-closing pairs, folding, and indentation
+- **Syntax highlighting** for `.tyhp` and `.tyhpdef` files, including HTML outside `<?tyhp` blocks and Tyhp code blocks in Markdown.
+- **Language server** (from the Tyhp CLI): diagnostics as you type, completion with auto-import, hover, go to definition, find references, rename, signature help, document and workspace symbols, semantic highlighting, code actions, and formatting.
+- **Project aware**: each `tyhp.json` in the workspace gets its own language server, and a file is checked by the project whose `include` / `exclude` globs match it. Files that belong to no project get highlighting only.
+- **CLI management**: finds `tyhp` on your `PATH`, or installs it from GitHub Releases and keeps it up to date.
+- **Tasks**: `tyhp: build` and `tyhp: lint`, with build errors in the Problems panel.
+- **Debugging**: starts the Tyhp XDebug proxy so the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) extension stops on breakpoints in `.tyhp` files.
+- **Status bar**: shows the current project, language server state, CLI health, and the XDebug proxy, with quick actions on click.
+- **File icons** for `.tyhp` and `.tyhpdef`, plus an optional **Tyhp File Icons** theme.
 
-Language light/dark file icons show in the explorer without changing your file icon theme. The optional **Tyhp File Icons** theme (`File Icon Theme` picker) maps `.tyhp` vs `.tyhpdef` with default, light, and high-contrast variants. It only defines Tyhp glyphs, so keep your existing theme selected unless you want those mappings.
+## Requirements
 
-Highlighting QA samples: `samples/highlight-audit.tyhp`, `samples/highlight-audit.tyhpdef`, and `samples/highlight-audit.md`.
+- The **Tyhp CLI** (`tyhp`). If it is not on your `PATH`, run **Tyhp: Install / Update CLI**, or set `tyhp.path` to an existing binary. See [Installing Tyhp](https://tyhplang.com/intro_installation.html).
+- A `tyhp.json` project file. Opening a Tyhp file outside any project offers **Tyhp: Initialize Project**, which runs `tyhp init`.
+- For debugging: the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) extension and XDebug.
 
-## Development (compile + F5)
+## Getting started
 
-The extension has a TypeScript entry point (`src/extension.ts`). Language contributions (TextMate grammars) load from `package.json` regardless; compiling is required so `main` can activate without an error.
+1. Install the extension.
+2. Open a folder that contains a `tyhp.json`, or run **Tyhp: Initialize Project** to create one.
+3. Open a `.tyhp` file. The language server starts for that file's project, and the status bar shows **ready** once it is running.
 
-From this directory (`vscode/`):
+If the status bar shows **CLI missing**, click it and choose **Install / Update CLI**.
 
-```bash
-npm install
-npm run compile
-npm test
-```
+## Debugging `.tyhp` files
 
-`npm run package` compiles, then **esbuild-bundles** `src/extension.ts` (including `vscode-languageclient`) into `out/extension.js` so the VSIX does not need `node_modules` at runtime, then runs `npm run check-package` and fails the build if any tsc per-module `out/<folder>/*.js` would be packed. Run `npm run check-package` on its own to re-check an existing build without repackaging.
+1. Turn on sourcemaps in `tyhp.json` and build the project (**Terminal → Run Task… → tyhp: build**):
 
-**F5 (Extension Development Host):** open **this folder** (`vscode/`) as the workspace in VS Code or Cursor, then press F5. That uses `.vscode/launch.json` (`Run Extension`). The first launch compiles/watches via `.vscode/tasks.json`.
-
-To package a local VSIX (publish that file separately; see [Publishing](#publishing)):
-
-```bash
-npm run package
-# or: npx vsce package
-```
-
-## Local Installation
-
-### Option 1: Symlink (recommended for development)
-
-Changes to the grammar are picked up on each window reload — no reinstall needed. Run `npm install` and `npm run compile` in this folder so `out/extension.js` exists.
-
-**Important:** The symlink target must be an **absolute path** (e.g. `/Users/you/repos/tyhp-ide-plugin/vscode`). Do not use a relative path like `./vscode` — `ln -s` resolves relative targets from the extensions directory, not your current shell directory, which creates a broken self-referential symlink.
-
-The symlink must also use Cursor/VS Code's expected folder name: `{publisher}.{name}-{version}` (from `package.json`). For this extension that is `Tyhp.tyhp-<version>` — currently `Tyhp.tyhp-0.8.3`.
-
-If you previously installed as `tyhp-lang.tyhp-language-<version>` (old folder / old `name`) or `tyhp-lang.tyhp-0.8.1` / `0.7.0` / `0.5.0`, remove that install first.
-
-From the clone root ([tyhp-ide-plugin](https://github.com/tyhpproject/tyhp-ide-plugin)):
-
-```bash
-rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.3   # Cursor
-ln -s "$(pwd)/vscode" ~/.cursor/extensions/Tyhp.tyhp-0.8.3
-
-rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.3  # VS Code
-ln -s "$(pwd)/vscode" ~/.vscode/extensions/Tyhp.tyhp-0.8.3
-```
-
-Or use an explicit absolute path:
-
-**Cursor:**
-
-```bash
-rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.3
-ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.cursor/extensions/Tyhp.tyhp-0.8.3
-```
-
-**VS Code:**
-
-```bash
-rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.3
-ln -s "/path/to/tyhp-ide-plugin/vscode" ~/.vscode/extensions/Tyhp.tyhp-0.8.3
-```
-
-Then **fully quit and reopen** Cursor/VS Code (`Cmd+Q`, not just "Reload Window"). If you previously had a broken install, also remove the extension from `~/.cursor/extensions/.obsolete` if it lists `tyhp-lang.tyhp-0.8.1`, `tyhp-lang.tyhp-0.8.0`, `tyhp-lang.tyhp-0.6.0`, `tyhp-lang.tyhp-0.5.0`, `tyhp-lang.tyhp-0.4.0`, `tyhp-lang.tyhp-0.3.1`, or `tyhp-lang.tyhp-language-0.2.1`.
-
-### Option 2: Sideload a VSIX
-
-Build the VSIX from `vscode/` (requires `npm install` once):
-
-```bash
-cd vscode
-npm install
-npm run package
-```
-
-`vsce package` writes `tyhp-0.8.3.vsix` in this folder. Sideload that file locally. Publishing it is a separate step; see [Publishing](#publishing).
-
-**Cursor:**
-
-```bash
-cursor --install-extension tyhp-0.8.3.vsix
-```
-
-**VS Code:**
-
-```bash
-code --install-extension tyhp-0.8.3.vsix
-```
-
-You can also use **Install from VSIX…** in the Extensions view (`…` menu).
-
-A global `vsce` is optional; `npm run package` uses the local `@vscode/vsce` devDependency. Equivalent:
-
-```bash
-npx vsce package
-```
-
-### Option 3: Copy to extensions directory
-
-From the clone root, compile first (`npm run compile` inside `vscode/`), then copy. The folder name must be `Tyhp.tyhp-<version>`:
-
-**Cursor:**
-
-```bash
-cp -r vscode ~/.cursor/extensions/Tyhp.tyhp-0.8.3
-```
-
-**VS Code:**
-
-```bash
-cp -r vscode ~/.vscode/extensions/Tyhp.tyhp-0.8.3
-```
-
-Then fully quit and reopen the editor.
-
-## Publishing
-
-Build once with `npm run package`, then upload that VSIX to both registries. The filename follows `package.json` `version` (currently `tyhp-0.8.3.vsix`). Leave the version argument off `vsce publish`: passing `patch`, `minor`, `major`, or a version string runs `npm version` and creates a git commit and tag.
-
-From `vscode/`:
-
-```bash
-npm run package
-```
-
-### Visual Studio Marketplace
-
-VS Code installs from [marketplace.visualstudio.com](https://marketplace.visualstudio.com/items?itemName=Tyhp.tyhp). Publisher id is `Tyhp` (`package.json` `publisher`).
-
-Create an Azure DevOps personal access token with organization **All accessible organizations** and scope **Marketplace (Manage)**. Pass it as `VSCE_PAT`, or store it once with `npx vsce login Tyhp`. Full token and publisher setup: [Publishing Extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension).
-
-```bash
-npx vsce publish --packagePath tyhp-0.8.3.vsix
-```
-
-Azure DevOps global personal access tokens are retired on 2026-12-01. After that, publish with Microsoft Entra ID: `npx vsce publish --packagePath tyhp-0.8.3.vsix --azure-credential`.
-
-You can also upload the VSIX on the [publisher management page](https://marketplace.visualstudio.com/manage).
-
-### Open VSX
-
-Cursor installs from [open-vsx.org](https://open-vsx.org/extension/Tyhp/tyhp). The Open VSX namespace is the same `publisher` value, `Tyhp`.
-
-Create an access token at [open-vsx.org/user-settings/tokens](https://open-vsx.org/user-settings/tokens). Pass it as `OVSX_PAT` or `npx ovsx publish -p <token>`. Before the first publish, create the namespace once:
-
-```bash
-npx ovsx create-namespace Tyhp
-```
-
-Publish the same VSIX:
-
-```bash
-npx ovsx publish tyhp-0.8.3.vsix
-```
-
-`ovsx` is not an npm dependency of this package; `npx` downloads it. Details: [Publishing Extensions](https://github.com/eclipse-openvsx/openvsx/wiki/Publishing-Extensions) (Open VSX).
-
-## Tyhp CLI binary
-
-The extension locates a `tyhp` executable and records it in `tyhp.path`. The language server, tasks, and the XDebug proxy use the same resolution API (`resolveTyhpBinary()`) rather than reading the setting ad hoc.
-
-### Discovery
-
-1. If `tyhp.path` is set, that value wins (absolute path, `~/…`, or a command name on `PATH`). A missing or non-file path shows an error on the status bar; click it or run **Tyhp: Install / Update CLI**.
-2. If `tyhp.path` is empty, activation and **Tyhp: Refresh Tyhp binary** search `PATH` for `tyhp` / `tyhp.exe`. A hit **writes** `tyhp.path` (User settings by default; Workspace / folder scope if that override already exists).
-
-### Install / Update
-
-**Tyhp: Install / Update CLI** downloads an official compiler binary from GitHub Releases:
-
-| Mode | Location | Auto-update |
-|------|----------|-------------|
-| **Global** | Unix: `~/.local/bin/tyhp` (same as `scripts/install.sh`). Windows: `%LOCALAPPDATA%\Programs\tyhp\tyhp.exe` (same as `scripts/install.ps1`). | Never. Update only via this command. |
-| **Extension only** | `{extension globalStorage}/cli/tyhp` (or `tyhp.exe`) | Yes, when `tyhp.binary.autoUpdate` is on **and** metadata shows this extension installed the file. |
-
-After a successful install, `tyhp.path` and `tyhp.binary.installMode` (`path` \| `global` \| `extension`) are updated.
-
-`tyhp.binary.pinnedVersion` (extension-only): if non-empty, install/keep that GitHub tag and do **not** auto-update to other versions. Tags may omit the leading `v` (`805.1.2-beta.4` = `v805.1.2-beta.4`).
-
-Startup auto-update is delayed ~5s and skipped when a check ran in the last 6 hours (pin enforcement still runs).
-
-### Release artifacts
-
-Source: GitHub Releases for [`tyhpproject/tyhp`](https://github.com/tyhpproject/tyhp/releases) — the same assets as `scripts/install.sh` / `scripts/release.sh`.
-
-- **API:** `GET https://api.github.com/repos/tyhpproject/tyhp/releases?per_page=20` (first non-draft, **including prereleases**). Do not use `/releases/latest` (it hides prereleases). A pin uses `/releases/tags/{tag}`.
-- **Asset names:** `tyhp-{os}-{arch}` or `tyhp-{os}-{arch}-fxdependent`, with `.exe` on Windows. `os` is `osx` \| `linux` \| `win`; `arch` is `x64` \| `arm64`. Published set: `tyhp-osx-arm64`, `tyhp-osx-x64`, `tyhp-linux-x64`, `tyhp-linux-arm64`, `tyhp-win-x64.exe`, and matching `-fxdependent` variants. There is no `win-arm64` asset.
-- **Variant:** Extension-only always downloads the **self-contained** asset. Global matches the install scripts: **framework-dependent** when a .NET 9 runtime is detected, otherwise self-contained.
-- **Checksums:** each release includes `checksums.txt` (GNU `sha256sum` lines from `scripts/release.sh`). The download is hashed with SHA-256 and compared; a missing checksums file or mismatch **aborts** the install.
-- **Auth:** optional `GITHUB_TOKEN` or `GH_TOKEN` environment variable (GitHub API rate limits).
-- **Missing assets:** if the repo has no public compiler binaries yet, install fails with a clear error — set `tyhp.path` to a locally built `tyhp` instead.
-
-### Commands
-
-| Command | ID |
-|---------|-----|
-| Tyhp: Refresh Tyhp binary | `tyhp.refreshBinary` |
-| Tyhp: Install / Update CLI | `tyhp.installCli` |
-| Tyhp: Reveal CLI Path | `tyhp.revealBinary` |
-| Tyhp: Restart Language Server | `tyhp.restartLanguageServer` |
-| Tyhp: Initialize Project | `tyhp.initProject` |
-| Tyhp: Start XDebug Proxy | `tyhp.startXdebugProxy` |
-| Tyhp: Stop XDebug Proxy | `tyhp.stopXdebugProxy` |
-| Tyhp: Restart XDebug Proxy | `tyhp.restartXdebugProxy` |
-
-### Workspace and `tyhp init`
-
-The extension indexes every `tyhp.json` under the workspace (`**/tyhp.json`, skipping `node_modules`, `vendor`, `.git`, `bin`, `obj`, `dist`, `build`). A file is **owned** by the project whose `include` / `exclude` globs match, resolved relative to that `tyhp.json` directory — the same Matcher rules as `tyhp build`. Empty `include` owns nothing (the repo-root `tyhp.json` with `"include": []` is not an LSP project). Nested projects such as `runtime/packages/core/tyhp.json` can own both `./tyhp_src/**/*.tyhp` and sibling-package paths like `../php/_tyhpdef/**/*.tyhpdef`.
-
-If several projects match, one owner is chosen (do not merge two type worlds): nearest ancestor `tyhp.json`, else fewest path hops, else shortest then lexicographic path.
-
-Set `tyhp.projectPath` to a `tyhp.json` **file** (or a directory that contains one) to **force a single project** and skip scanning others. Files outside that project’s include stay TextMate-only.
-
-If you open a `.tyhp` / `.tyhpdef` file that has **no owner** and **no ancestor `tyhp.json`** up to the workspace root, a prompt offers **Initialize Project**. An ancestor that exists but does not include the file stays silent (TextMate only). `tyhp.projectPath` also suppresses the prompt. The command (also in the Command Palette) runs the resolved CLI:
-
-```text
-<resolved tyhp> init --yes
-```
-
-cwd is the workspace folder that contains the file (or the first folder). `--yes` accepts init defaults without prompting. `--tyhp-project` is **not** passed: that flag requires an existing file. After a successful init, the workspace index reloads and a language server starts when an owned file is open.
-
-Build/lint tasks and the XDebug proxy use the **active editor’s owner** `tyhp.json` as `--tyhp-project`.
-
-### Tasks
-
-**Terminal → Run Task…** lists:
-
-| Task | Argv |
-|------|------|
-| `tyhp: build` | `build --quiet [--tyhp-project=<file>]` |
-| `tyhp: lint` | `lint --quiet --format=json [--tyhp-project=<file>]` |
-
-Both use `resolveTyhpBinary()` (never `tyhp.path` directly). Build uses the `$tyhp` problem matcher for rustc-style `file(line,col): error TYHP####: …` headers. Lint JSON is shown in the terminal (VS Code problem matchers are line-based; matching the JSON document is optional).
-
-You can also put a task in `.vscode/tasks.json`:
-
-```json
-{
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "tyhp",
-            "action": "build",
-            "label": "tyhp: build"
+    ```json
+    {
+        "build": {
+            "generateSourcemap": true
         }
-    ]
-}
-```
-
-### Status bar
-
-The left status bar item shows `Tyhp`, the **owner** project folder name (or **not in a Tyhp project**), LSP **ready** / **starting** / **error**, CLI health, and **proxy** when `tyhp xdebug_proxy` is listening. Click it for Restart Language Server, Install / Update CLI, Reveal CLI Path, Initialize Project (when the active file has no owner), and Start / Stop / Restart XDebug Proxy. Proxy logs: Output panel > **Tyhp XDebug Proxy**.
-
-### Language server
-
-Opening a `.tyhp` / `.tyhpdef` file (language id `tyhp` — there is no separate `tyhpdef` language) starts `tyhp language_server` **for the owning `tyhp.json` only**, as a child process over stdin/stdout:
-
-```text
-<resolved tyhp> language_server --quiet --stdio --tyhp-project=<path-to-that-project's-tyhp.json>
-```
-
-A second nested project gets its own process when you open a file it owns. At most `tyhp.languageServer.maxSessions` servers run at once (default **8**); visible editors are started first so a workspace with many `tyhp.json` files cannot spawn one `tyhp` per package. Each client’s document middleware keeps other projects’ files off that server. Files with no owner never start a server (TextMate highlighting still works).
-
-`--tyhp-project` is the owner file, or the forced `tyhp.projectPath` when that setting is set. Extra tokens from `tyhp.languageServer.args` are appended after those flags.
-
-If the CLI binary is missing, activation still succeeds. The status bar shows **CLI missing** and **Tyhp: Install / Update CLI** remains available.
-
-If the resolved CLI is too old (`language_server` is missing) or the process exits before initialize completes, the client **does not** retry in a loop. You get one error with **Install / Update CLI**, **Open Settings** (`tyhp.path`), or **Show Output**. Point `tyhp.path` at a current build, then **Tyhp: Restart Language Server**.
-
-If a healthy server later crashes, the client restarts it with exponential backoff, then stops after a few failures instead of toasting forever. A server that only stays up briefly does **not** reset that counter. Stopping the extension host stops the server (`deactivate` → tracked child SIGTERM/SIGKILL).
-
-Logs and LSP traces go to **Output** > **Tyhp Language Server**. Set `tyhp.languageServer.trace` to `messages` or `verbose` when debugging the protocol.
-
-### Debugging `.tyhp` (XDebug proxy)
-
-The extension starts `tyhp xdebug_proxy` so the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) extension (`xdebug.php-debug`) can hit breakpoints in `.tyhp` sources. It does **not** reimplement DBGp and does not replace PHP Debug.
-
-**Prerequisites**
-
-1. Enable sourcemaps in `tyhp.json` and **build** the project (maps are `.php.map` files next to emitted PHP, usually under `output.path`, default `build/`):
-
-```json
-{
-    "build": {
-        "generateSourcemap": true
     }
-}
-```
+    ```
 
-See [Source map generation](https://tyhplang.com/cli_sourcemapGeneration.html) and [XDebug proxy](https://tyhplang.com/cli_xdebugProxy.html).
+2. Point XDebug at the proxy's XDebug port (default `9004`):
 
-2. Install **PHP Debug** (`xdebug.php-debug`). It is the DBGp client; this extension only launches the proxy and contributes a launch snippet.
+    ```ini
+    xdebug.mode = debug
+    xdebug.client_host = 127.0.0.1
+    xdebug.client_port = 9004
+    ```
 
-3. Point XDebug at the proxy **XDebug port** (default **9004**), not the IDE port:
+3. Run **Tyhp: Start XDebug Proxy**.
+4. Add the **Tyhp: Listen for XDebug (via proxy)** launch configuration and start it. It listens on the proxy's IDE port (default `9003`).
+5. Set a breakpoint in a `.tyhp` file and run your compiled PHP.
 
-```ini
-xdebug.mode = debug
-xdebug.client_host = 127.0.0.1
-xdebug.client_port = 9004
-xdebug.idekey = tyhp
-```
+More detail: [Source map generation](https://tyhplang.com/cli_sourcemapGeneration.html) and [XDebug proxy](https://tyhplang.com/cli_xdebugProxy.html).
 
-**Start the proxy**
+## Commands
 
-Command Palette / status bar: **Tyhp: Start XDebug Proxy**. Argv (resolved CLI; flags are the real CLI switches):
+| Command | What it does |
+|---------|--------------|
+| **Tyhp: Install / Update CLI** | Download the Tyhp CLI from GitHub Releases, globally or for this extension only |
+| **Tyhp: Refresh Tyhp binary** | Search `PATH` for `tyhp` again |
+| **Tyhp: Reveal CLI Path** | Show which `tyhp` binary is in use |
+| **Tyhp: Restart Language Server** | Restart every running Tyhp language server |
+| **Tyhp: Initialize Project** | Run `tyhp init` to create a `tyhp.json` |
+| **Tyhp: Start / Stop / Restart XDebug Proxy** | Control the proxy used for debugging |
 
-```text
-<resolved tyhp> xdebug_proxy --tyhp-project=<path-to-tyhp.json> --ide-port=9003 --xdebug-port=9004 [--sourcemap-dir=<dir>] [--ide-key=<key>]
-```
+## Settings
 
-Ports: explicit `tyhp.xdebugProxy.idePort` / `xdebugPort` / `sourceMapDir` settings win; otherwise `tyhp.json` `xdebugProxy.*`; otherwise defaults **9003** (IDE) and **9004** (XDebug). `--sourcemap-dir` is omitted when unset so the CLI uses `output.path`. **Tyhp: Stop XDebug Proxy** sends SIGTERM to that process and waits for it to release the ports.
+| Setting | Description |
+|---------|-------------|
+| `tyhp.path` | Path to the `tyhp` CLI. Filled in automatically when the CLI is found on `PATH` or installed by the extension |
+| `tyhp.projectPath` | Use a single `tyhp.json` instead of every project in the workspace |
+| `tyhp.languageServer.args` | Extra arguments for `tyhp language_server` |
+| `tyhp.languageServer.trace` | Log language server messages: `off`, `messages`, or `verbose` |
+| `tyhp.languageServer.maxSessions` | Maximum number of language servers running at once (default 8) |
+| `tyhp.diagnostics.enable` | Show diagnostics in the Problems panel |
+| `tyhp.completion.autoImport` | Offer auto-import in completion and code actions |
+| `tyhp.binary.installMode` | How the CLI was installed: `path`, `global`, or `extension` (set automatically) |
+| `tyhp.binary.autoUpdate` | Keep an extension-installed CLI up to date |
+| `tyhp.binary.pinnedVersion` | Keep an extension-installed CLI on one release tag, such as `805.1.2-beta.4` |
+| `tyhp.xdebugProxy.idePort` | Port PHP Debug listens on (default 9003, or `xdebugProxy.idePort` in `tyhp.json`) |
+| `tyhp.xdebugProxy.xdebugPort` | Port XDebug connects to (default 9004, or `xdebugProxy.xdebugPort` in `tyhp.json`) |
+| `tyhp.xdebugProxy.sourceMapDir` | Directory of `.php.map` files, if not the project's output path |
 
-**launch.json**
+## Troubleshooting
 
-Add a PHP Debug configuration that listens on the **proxy IDE port** (default **9003**). The extension contributes this snippet and a debug configuration provider:
+- **No diagnostics or completion in a file**: the file may not match any project's `include` globs. The status bar shows **not in a Tyhp project** in that case.
+- **Language server errors**: check **Output → Tyhp Language Server**. Set `tyhp.languageServer.trace` to `messages` to log the protocol. An outdated CLI can fail to start the server; update it with **Tyhp: Install / Update CLI**.
+- **Breakpoints stay in the `.php` file**: enable `build.generateSourcemap` and rebuild. Proxy logs are in **Output → Tyhp XDebug Proxy**.
+- **Proxy port already in use**: stop the other process, or change `tyhp.xdebugProxy.idePort` / `tyhp.xdebugProxy.xdebugPort`.
 
-```json
-{
-    "name": "Listen for Tyhp (XDebug proxy)",
-    "type": "php",
-    "request": "launch",
-    "port": 9003
-}
-```
+## Links
 
-**Minimal manual QA**
-
-1. `generateSourcemap: true` + **Terminal → Run Task… → tyhp: build**
-2. Start the proxy (status bar or **Tyhp: Start XDebug Proxy**). Output > **Tyhp XDebug Proxy** should show `XDebug Proxy started` and loaded maps.
-3. Install PHP Debug if prompted. Run **Listen for Tyhp (XDebug proxy)**.
-4. Set a breakpoint in a `.tyhp` file, then run the compiled PHP (browser or `php`) with XDebug `client_port=9004`. The breakpoint should hit in the `.tyhp` source, not only the emitted `.php`.
-
-**Misconfiguration**
-
-| Symptom | What to do |
-|---------|------------|
-| Proxy will not start / port in use | Stop the proxy from the status bar, or change `tyhp.xdebugProxy.idePort` / `xdebugPort` (or `tyhp.json` `xdebugProxy`). See Output > **Tyhp XDebug Proxy**. |
-| No sourcemaps / breakpoints stay on `.php` | Set `build.generateSourcemap` and rebuild. Docs: [sourcemaps](https://tyhplang.com/cli_sourcemapGeneration.html). |
-| PHP Debug missing | Install `xdebug.php-debug`. Starting a Tyhp launch config offers that action. |
-| Proxy down when debugging | The launch resolver offers **Start XDebug Proxy**. Docs: [xdebug_proxy](https://tyhplang.com/cli_xdebugProxy.html). |
-
-### Settings (`tyhp.*`)
-
-| Key | Role |
-|-----|------|
-| `tyhp.path` | CLI path or command name |
-| `tyhp.projectPath` | Force a single `tyhp.json` (file or directory). Empty indexes every workspace `tyhp.json` and routes files by `include`/`exclude`. Passed as `--tyhp-project` (file path) |
-| `tyhp.languageServer.args` | Extra args after `language_server` (`--quiet` / `--stdio` / `--tyhp-project` are added automatically) |
-| `tyhp.languageServer.trace` | `off` \| `messages` \| `verbose` |
-| `tyhp.languageServer.maxSessions` | Max concurrent `tyhp language_server` processes (default 8, max 32) |
-| `tyhp.diagnostics.enable` | Publish diagnostics to the Problems panel |
-| `tyhp.completion.autoImport` | Auto-import (server-side; later UX) |
-| `tyhp.binary.installMode` | `path` \| `global` \| `extension` |
-| `tyhp.binary.autoUpdate` | Extension-only auto-update |
-| `tyhp.binary.pinnedVersion` | Extension-only pinned release tag |
-| `tyhp.xdebugProxy.idePort` | IDE listen port (PHP Debug). Explicit setting > `tyhp.json` `xdebugProxy.idePort` > `9003` |
-| `tyhp.xdebugProxy.xdebugPort` | XDebug engine port (`client_port`). Explicit setting > `tyhp.json` `xdebugProxy.xdebugPort` > `9004` |
-| `tyhp.xdebugProxy.sourceMapDir` | Optional `--sourcemap-dir`. Empty uses `tyhp.json` `xdebugProxy.sourceMapDir`, else CLI `output.path` |
-
-## Uninstalling
-
-If installed via symlink or copy, remove the folder from the extensions directory:
-
-```bash
-rm -rf ~/.cursor/extensions/Tyhp.tyhp-0.8.3
-# or
-rm -rf ~/.vscode/extensions/Tyhp.tyhp-0.8.3
-```
-
-If installed via VSIX:
-
-```bash
-cursor --uninstall-extension Tyhp.tyhp
-# or
-code --uninstall-extension Tyhp.tyhp
-```
+- [Tyhp documentation](https://tyhplang.com)
+- [Language server reference](https://tyhplang.com/cli_languageServer.html)
+- [Report an issue](https://github.com/tyhpproject/tyhp-ide-plugin/issues)
+- [Contributing and building from source](https://github.com/tyhpproject/tyhp-ide-plugin/blob/main/vscode/DEVELOPMENT.md)

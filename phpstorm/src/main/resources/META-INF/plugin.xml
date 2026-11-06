@@ -3,11 +3,11 @@
     <name>Tyhp Language</name>
     <vendor url="https://github.com/tyhpproject/tyhp-ide-plugin">tyhp-lang</vendor>
     <idea-version since-build="262"/>
-    <version>0.7.0</version>
+    <version>0.7.1</version>
 
     <description><![CDATA[
         <p><b>Tyhp Language</b> (<code>tyhp-lang</code>) — first-party PhpStorm client for the Tyhp toolchain.</p>
-        <p>        This 0.7.0 build starts one language server per owned <code>tyhp.json</code> (include/exclude membership, lazy start)
+        <p>        This 0.7.1 build starts one language server per owned <code>tyhp.json</code> (include/exclude membership, lazy start)
         and keeps XDebug-proxy debug, <code>tyhp init</code>,
         build/lint run configurations, a status bar, TextMate highlighting, file icons, and CLI binary resolution / install / updates.</p>
         <ul>

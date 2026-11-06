@@ -10,8 +10,14 @@ export const STOP_KILL_TIMEOUT_MS = 2_000;
 export interface TrackedChild {
     readonly pid?: number;
     readonly exitCode: number | null;
+    readonly signalCode?: NodeJS.Signals | null;
     kill(signal?: NodeJS.Signals): boolean;
     on(event: "exit" | "error", listener: (...args: unknown[]) => void): void;
+}
+
+/** A child killed by a signal has `exitCode === null` and `signalCode` set. */
+export function hasExited(child: TrackedChild): boolean {
+    return child.exitCode !== null || (child.signalCode ?? null) !== null;
 }
 
 /**
@@ -37,39 +43,49 @@ export function spawnLanguageServerProcess(
     });
 }
 
+/**
+ * SIGTERM, then SIGKILL after `termTimeoutMs`. Resolves `true` once the child
+ * has exited (or there was none) and `false` if it is still alive after
+ * `killTimeoutMs`; never rejects.
+ */
 export async function stopTrackedProcess(
     child: TrackedChild | undefined,
     options: { termTimeoutMs?: number; killTimeoutMs?: number } = {}
-): Promise<void> {
-    if (!child || child.exitCode !== null) {
-        return;
+): Promise<boolean> {
+    if (!child || hasExited(child)) {
+        return true;
     }
     const termMs = options.termTimeoutMs ?? STOP_TERM_TIMEOUT_MS;
     const killMs = options.killTimeoutMs ?? STOP_KILL_TIMEOUT_MS;
     try {
         child.kill("SIGTERM");
     } catch {
-        return;
+        return hasExited(child);
     }
     try {
         await waitForProcessExit(child, termMs);
-        return;
+        return true;
     } catch {
         // SIGTERM ignored or hung — escalate. Still Node ChildProcess.kill.
     }
-    if (child.exitCode !== null) {
-        return;
+    if (hasExited(child)) {
+        return true;
     }
     try {
         child.kill("SIGKILL");
     } catch {
-        return;
+        return hasExited(child);
     }
-    await waitForProcessExit(child, killMs);
+    try {
+        await waitForProcessExit(child, killMs);
+        return true;
+    } catch {
+        return hasExited(child);
+    }
 }
 
 export function waitForProcessExit(child: TrackedChild, timeoutMs: number): Promise<void> {
-    if (child.exitCode !== null) {
+    if (hasExited(child)) {
         return Promise.resolve();
     }
     return new Promise((resolve, reject) => {

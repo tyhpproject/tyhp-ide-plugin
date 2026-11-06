@@ -24,6 +24,11 @@ import { spawnLanguageServerProcess, stopTrackedProcess } from "./trackedProcess
 
 export type LspClientState = "stopped" | "starting" | "running" | "error";
 
+const CLIENT_STOP_TIMEOUT_MS = 2_000;
+
+/** Timeouts used when the extension host is shutting down and every session stops at once. */
+const FAST_STOP = { clientTimeoutMs: 500, termTimeoutMs: 1_000, killTimeoutMs: 1_000 } as const;
+
 export interface LspSessionHost {
     readonly output: vscode.OutputChannel;
     readonly disposed: () => boolean;
@@ -63,6 +68,16 @@ export class LspSession {
         return this.state;
     }
 
+    /** PID of the running `tyhp language_server` child, if one is alive. */
+    get pid(): number | undefined {
+        return this.child?.pid;
+    }
+
+    /** Project folder name, as used in output-channel prefixes. */
+    get displayLabel(): string {
+        return this.label();
+    }
+
     async start(): Promise<void> {
         return this.lifecycle.enqueue(() => this.startImpl());
     }
@@ -81,10 +96,11 @@ export class LspSession {
         });
     }
 
-    async stop(): Promise<void> {
+    /** `fast` shortens every shutdown timeout; used when the extension host is deactivating. */
+    async stop(options: { fast?: boolean } = {}): Promise<void> {
         return this.lifecycle.enqueue(async () => {
             this.cancelScheduledRestart();
-            await this.stopClient({ intentional: true });
+            await this.stopClient({ intentional: true, fast: options.fast });
             this.setState("stopped");
         });
     }
@@ -156,6 +172,15 @@ export class LspSession {
             return;
         }
         this.child = child;
+        this.host.output.appendLine(`[${this.label()}] Language server pid ${child.pid}.`);
+        child.on("exit", (code, signal) => {
+            if (this.host.disposed()) {
+                return;
+            }
+            this.host.output.appendLine(
+                `[${this.label()}] Language server pid ${child.pid} exited (${signal ?? `code ${code}`}).`
+            );
+        });
         child.on("error", (err) => {
             const message = err instanceof Error ? err.message : String(err);
             this.host.output.appendLine(`[${this.label()}] Language server process error: ${message}`);
@@ -169,7 +194,7 @@ export class LspSession {
                     this.reachedRunning = true;
                     this.runningSinceMs = Date.now();
                     this.setState("running");
-                    this.host.output.appendLine(`[${this.label()}] Language server is running.`);
+                    this.host.output.appendLine(`[${this.label()}] Language server is running (pid ${child.pid}).`);
                 } else if (event.newState === State.Stopped && this.state === "running") {
                     this.setState("stopped");
                 }
@@ -301,7 +326,7 @@ export class LspSession {
         await stopTrackedProcess(child);
     }
 
-    private async stopClient(options: { intentional: boolean }): Promise<void> {
+    private async stopClient(options: { intentional: boolean; fast?: boolean }): Promise<void> {
         this.intentionalStop = options.intentional;
         this.runningSinceMs = undefined;
         const client = this.client;
@@ -310,15 +335,26 @@ export class LspSession {
         this.child = undefined;
         this.lastStartedKey = undefined;
         this.disposeClientListeners();
+        if (child?.pid !== undefined) {
+            this.host.output.appendLine(`[${this.label()}] Stopping language server pid ${child.pid}.`);
+        }
         if (client) {
             try {
-                await client.stop(2_000);
+                await client.stop(options.fast ? FAST_STOP.clientTimeoutMs : CLIENT_STOP_TIMEOUT_MS);
             } catch (err) {
                 const message = err instanceof Error ? err.message : String(err);
                 this.host.output.appendLine(`[${this.label()}] Error stopping language server: ${message}`);
             }
         }
-        await stopTrackedProcess(child);
+        const stopped = await stopTrackedProcess(
+            child,
+            options.fast ? { termTimeoutMs: FAST_STOP.termTimeoutMs, killTimeoutMs: FAST_STOP.killTimeoutMs } : {}
+        );
+        if (!stopped && child?.pid !== undefined) {
+            this.host.output.appendLine(
+                `[${this.label()}] Language server pid ${child.pid} did not exit after SIGKILL.`
+            );
+        }
     }
 
     private disposeClientListeners(): void {

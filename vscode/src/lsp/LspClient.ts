@@ -16,10 +16,18 @@ export interface LspWorkspaceLookup {
     ownerOfUri(uri: vscode.Uri): { projectFilePath: string } | undefined;
 }
 
+export interface LspSessionSummary {
+    label: string;
+    state: LspClientState;
+    pid?: number;
+    /** True for the session that owns the active editor. */
+    active: boolean;
+}
+
 /**
  * One language client per owned `tyhp.json`, started lazily when a file that
- * project owns is opened. Idle-stopped when no open Tyhp documents remain for
- * that project, and capped so a monorepo cannot spawn one `tyhp` per package.
+ * project owns is opened. Stopped when no editor tab shows a Tyhp file of that
+ * project, and capped so a monorepo cannot spawn one `tyhp` per package.
  */
 export class LspClient implements vscode.Disposable, LspSessionHost {
     readonly output: vscode.OutputChannel;
@@ -67,6 +75,9 @@ export class LspClient implements vscode.Disposable, LspSessionHost {
             vscode.window.onDidChangeVisibleTextEditors(() => {
                 this.ensureOpenTask.schedule();
             }),
+            vscode.window.tabGroups.onDidChangeTabs(() => {
+                this.ensureOpenTask.schedule();
+            }),
             vscode.window.onDidChangeActiveTextEditor(() => {
                 this.fireStateForActiveEditor();
             })
@@ -86,6 +97,24 @@ export class LspClient implements vscode.Disposable, LspSessionHost {
     get currentState(): LspClientState {
         const session = this.sessionForActiveEditor();
         return session?.currentState ?? "stopped";
+    }
+
+    /** Every session that is not stopped, active-editor session first. */
+    sessionSummaries(): LspSessionSummary[] {
+        const active = this.sessionForActiveEditor();
+        const summaries: LspSessionSummary[] = [];
+        for (const session of this.sessions.values()) {
+            if (session.currentState === "stopped" && session.pid === undefined) {
+                continue;
+            }
+            summaries.push({
+                label: session.displayLabel,
+                state: session.currentState,
+                pid: session.pid,
+                active: session === active,
+            });
+        }
+        return summaries.sort((a, b) => Number(b.active) - Number(a.active));
     }
 
     /**
@@ -188,9 +217,7 @@ export class LspClient implements vscode.Disposable, LspSessionHost {
         return this.lifecycle.enqueue(async () => {
             const running = [...this.sessions.values()];
             this.sessions.clear();
-            for (const session of running) {
-                await session.stop();
-            }
+            await Promise.all(running.map((session) => session.stop({ fast: true })));
             this.stateEmitter.fire("stopped");
         });
     }
@@ -260,22 +287,23 @@ export class LspClient implements vscode.Disposable, LspSessionHost {
         await session.start();
     }
 
+    /**
+     * Tabs, not `workspace.textDocuments`: VS Code keeps documents there after
+     * their tab closes, and other extensions open documents without a tab.
+     */
     private ownersToKeep(): string[] {
         return rankOwnersForSessions({
-            visibleOwners: this.ownedProjectKeys(visibleTyhpDocuments()),
-            openOwners: this.ownedProjectKeys(vscode.workspace.textDocuments),
+            visibleOwners: this.ownedProjectKeys(visibleTyhpUris()),
+            openOwners: this.ownedProjectKeys(tabbedTyhpUris()),
             maxSessions: settings.getLanguageServerMaxSessions(),
         });
     }
 
-    private ownedProjectKeys(documents: readonly vscode.TextDocument[]): string[] {
+    private ownedProjectKeys(uris: readonly vscode.Uri[]): string[] {
         const owners: string[] = [];
         const seen = new Set<string>();
-        for (const document of documents) {
-            if (document.languageId !== "tyhp" || document.uri.scheme !== "file") {
-                continue;
-            }
-            const owner = this.workspace?.ownerOfUri(document.uri);
+        for (const uri of uris) {
+            const owner = this.workspace?.ownerOfUri(uri);
             if (!owner) {
                 continue;
             }
@@ -294,11 +322,8 @@ export class LspClient implements vscode.Disposable, LspSessionHost {
         if (session) {
             return session.projectFilePath;
         }
-        for (const document of [...visibleTyhpDocuments(), ...vscode.workspace.textDocuments]) {
-            if (document.languageId !== "tyhp" || document.uri.scheme !== "file") {
-                continue;
-            }
-            const owner = this.workspace?.ownerOfUri(document.uri);
+        for (const uri of [...visibleTyhpUris(), ...tabbedTyhpUris()]) {
+            const owner = this.workspace?.ownerOfUri(uri);
             if (owner && this.keyOf(owner.projectFilePath) === key) {
                 return owner.projectFilePath;
             }
@@ -331,19 +356,56 @@ export class LspClient implements vscode.Disposable, LspSessionHost {
     }
 }
 
-function visibleTyhpDocuments(): vscode.TextDocument[] {
-    const documents: vscode.TextDocument[] = [];
+function visibleTyhpUris(): vscode.Uri[] {
+    const uris: vscode.Uri[] = [];
     const seen = new Set<string>();
     for (const editor of vscode.window.visibleTextEditors) {
-        const uri = editor.document.uri.toString();
-        if (seen.has(uri)) {
+        const document = editor.document;
+        const key = document.uri.toString();
+        if (document.languageId !== "tyhp" || document.uri.scheme !== "file" || seen.has(key)) {
             continue;
         }
-        seen.add(uri);
-        documents.push(editor.document);
+        seen.add(key);
+        uris.push(document.uri);
     }
-    return documents;
+    return uris;
 }
+
+/** File URIs of Tyhp documents shown in any editor tab, including background tabs and diffs. */
+function tabbedTyhpUris(): vscode.Uri[] {
+    const languages = new Map<string, string>();
+    for (const document of vscode.workspace.textDocuments) {
+        languages.set(document.uri.toString(), document.languageId);
+    }
+    const uris: vscode.Uri[] = [];
+    const seen = new Set<string>();
+    const add = (uri: vscode.Uri): void => {
+        const key = uri.toString();
+        if (uri.scheme !== "file" || seen.has(key)) {
+            return;
+        }
+        const language = languages.get(key) ?? (TYHP_FILE.test(uri.fsPath) ? "tyhp" : undefined);
+        if (language !== "tyhp") {
+            return;
+        }
+        seen.add(key);
+        uris.push(uri);
+    };
+    for (const group of vscode.window.tabGroups.all) {
+        for (const tab of group.tabs) {
+            const input = tab.input;
+            if (input instanceof vscode.TabInputText) {
+                add(input.uri);
+            } else if (input instanceof vscode.TabInputTextDiff) {
+                add(input.modified);
+                add(input.original);
+            }
+        }
+    }
+    return uris;
+}
+
+const TYHP_FILE = /\.tyhp(def)?$/i;
 
 function sessionLabel(projectFilePath: string): string {
     const posix = projectFilePath.replace(/\\/g, "/");

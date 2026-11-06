@@ -4,6 +4,8 @@ src/**
 samples/**
 scripts/**
 tsconfig.json
+DEVELOPMENT.md
+QA.md
 .gitignore
 **/*.map
 **/*.ts

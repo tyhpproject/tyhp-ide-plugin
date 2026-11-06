@@ -9,6 +9,15 @@ export interface StatusBarView {
     warning: boolean;
 }
 
+/** One language server process, as listed in the tooltip. */
+export interface StatusSessionSummary {
+    label: string;
+    state: StatusLspState;
+    pid?: number;
+    /** True for the session that owns the active editor. */
+    active: boolean;
+}
+
 export interface StatusBarInput {
     projectLabel: string;
     lspState: StatusLspState;
@@ -17,11 +26,13 @@ export interface StatusBarInput {
     binaryMessage?: string;
     proxyState?: StatusProxyState;
     proxyDetail?: string;
+    sessions?: readonly StatusSessionSummary[];
 }
 
 /**
  * Compact status-bar copy: `Tyhp` + owner project / “not in a Tyhp project” + LSP + binary health
- * + optional XDebug proxy listening state.
+ * + optional XDebug proxy listening state. The text counts language servers running for other
+ * projects; the tooltip lists every one with its PID.
  */
 export function formatStatusBar(input: StatusBarInput): StatusBarView {
     const project = input.projectLabel.trim() !== "" ? input.projectLabel.trim() : "not in a Tyhp project";
@@ -30,10 +41,13 @@ export function formatStatusBar(input: StatusBarInput): StatusBarView {
     const proxyState = input.proxyState ?? "stopped";
     const proxy = proxyLabel(proxyState, input.proxyDetail);
     const missingProject = isMissingProject(project);
+    const sessions = input.sessions ?? [];
+    const others = otherSessionsSuffix(sessions);
 
     const tooltipLines = [
         `Project: ${project}`,
         `Language server: ${lsp}`,
+        ...sessionTooltipLines(sessions),
         `CLI: ${binaryOk ? input.binaryPath ?? "ok" : input.binaryMessage ?? "missing"}`,
         `XDebug proxy: ${proxy}`,
         "Click for Tyhp actions.",
@@ -50,7 +64,7 @@ export function formatStatusBar(input: StatusBarInput): StatusBarView {
 
     if (input.lspState === "error") {
         return {
-            text: `$(error) Tyhp · ${project} · LSP error`,
+            text: `$(error) Tyhp · ${project} · LSP error${others}`,
             tooltip: tooltipLines.join("\n"),
             error: true,
             warning: false,
@@ -59,7 +73,7 @@ export function formatStatusBar(input: StatusBarInput): StatusBarView {
 
     if (input.lspState === "starting") {
         return {
-            text: `$(sync~spin) Tyhp · ${project} · starting`,
+            text: `$(sync~spin) Tyhp · ${project} · starting${others}`,
             tooltip: tooltipLines.join("\n"),
             error: false,
             warning: false,
@@ -68,7 +82,7 @@ export function formatStatusBar(input: StatusBarInput): StatusBarView {
 
     if (input.lspState === "stopped") {
         return {
-            text: `$(debug-disconnect) Tyhp · ${project} · LSP stopped`,
+            text: `$(debug-disconnect) Tyhp · ${project} · LSP stopped${others}`,
             tooltip: tooltipLines.join("\n"),
             error: false,
             warning: missingProject,
@@ -77,7 +91,7 @@ export function formatStatusBar(input: StatusBarInput): StatusBarView {
 
     if (proxyState === "error") {
         return {
-            text: `$(warning) Tyhp · ${project} · proxy error`,
+            text: `$(warning) Tyhp · ${project} · proxy error${others}`,
             tooltip: tooltipLines.join("\n"),
             error: false,
             warning: true,
@@ -87,11 +101,35 @@ export function formatStatusBar(input: StatusBarInput): StatusBarView {
     const proxySuffix = proxyTextSuffix(proxyState);
     const icon = missingProject ? "$(warning)" : "$(check)";
     return {
-        text: `${icon} Tyhp · ${project} · ${lsp}${proxySuffix}`,
+        text: `${icon} Tyhp · ${project} · ${lsp}${proxySuffix}${others}`,
         tooltip: tooltipLines.join("\n"),
         error: false,
         warning: missingProject,
     };
+}
+
+function sessionTooltipLines(sessions: readonly StatusSessionSummary[]): string[] {
+    if (sessions.length === 0) {
+        return [];
+    }
+    return [
+        `Language server processes (${sessions.length}):`,
+        ...sessions.map((session) => {
+            const pid = session.pid !== undefined ? `pid ${session.pid}` : "no process";
+            const active = session.active ? " (this file)" : "";
+            return `  ${session.label}: ${lspLabel(session.state)}, ${pid}${active}`;
+        }),
+    ];
+}
+
+function otherSessionsSuffix(sessions: readonly StatusSessionSummary[]): string {
+    const others = sessions.filter(
+        (session) => !session.active && (session.state === "running" || session.state === "starting")
+    ).length;
+    if (others === 0) {
+        return "";
+    }
+    return ` · +${others} server${others === 1 ? "" : "s"}`;
 }
 
 function isMissingProject(label: string): boolean {

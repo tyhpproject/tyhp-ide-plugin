@@ -50,6 +50,7 @@ export class StatusBarController implements vscode.Disposable {
             binaryMessage: binary.message,
             proxyState: this.proxy.currentState,
             proxyDetail,
+            sessions: this.lsp.sessionSummaries(),
         });
         this.item.text = view.text;
         this.item.tooltip = view.tooltip;

@@ -6,13 +6,15 @@ import { stopTrackedProcess, TrackedChild, waitForProcessExit } from "./trackedP
 class FakeChild extends EventEmitter implements TrackedChild {
     pid = 99;
     exitCode: number | null = null;
+    signalCode: NodeJS.Signals | null = null;
     signals: NodeJS.Signals[] = [];
     ignoreTerm = false;
+    ignoreAll = false;
 
     kill(signal?: NodeJS.Signals): boolean {
         const sig = signal ?? "SIGTERM";
         this.signals.push(sig);
-        if (this.ignoreTerm && sig === "SIGTERM") {
+        if (this.ignoreAll || (this.ignoreTerm && sig === "SIGTERM")) {
             return true;
         }
         this.exit(0);
@@ -54,4 +56,20 @@ test("waitForProcessExit resolves when the child is already dead", async () => {
     const child = new FakeChild();
     child.exit(1);
     await waitForProcessExit(child, 10);
+});
+
+test("stopTrackedProcess treats a child killed by a signal as exited", async () => {
+    const child = new FakeChild();
+    child.signalCode = "SIGTERM";
+    const stopped = await stopTrackedProcess(child, { termTimeoutMs: 30, killTimeoutMs: 30 });
+    assert.equal(stopped, true);
+    assert.deepEqual(child.signals, []);
+});
+
+test("stopTrackedProcess resolves false instead of throwing when the child survives SIGKILL", async () => {
+    const child = new FakeChild();
+    child.ignoreAll = true;
+    const stopped = await stopTrackedProcess(child, { termTimeoutMs: 20, killTimeoutMs: 20 });
+    assert.equal(stopped, false);
+    assert.deepEqual(child.signals, ["SIGTERM", "SIGKILL"]);
 });

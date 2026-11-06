@@ -34,7 +34,7 @@ npm run package
 
 `npm test` compiles TypeScript and runs the unit tests. `npm run package` writes a local VSIX. Publish that VSIX to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Tyhp.tyhp) and to [Open VSX](https://open-vsx.org/extension/Tyhp/tyhp).
 
-Install and publish steps are in [`vscode/README.md`](vscode/README.md).
+Install and publish steps are in [`vscode/DEVELOPMENT.md`](vscode/DEVELOPMENT.md).
 
 ## PhpStorm
 

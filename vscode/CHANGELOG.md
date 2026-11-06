@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.4
+
+- `lazy new` is highlighted as a keyword. A method named `lazy` is not
+- A project's language server stops when you close its last Tyhp editor tab. Before, it kept running while VS Code still held the closed file in memory
+- The status bar counts language servers running for other projects (`+1 server`), and its tooltip lists each server with its state and PID. Before, it showed only the active editor's server, so a server left running elsewhere read as "LSP stopped"
+- The **Tyhp Language Server** output logs each server's PID when it starts, stops, and exits
+- On window close, all language servers stop in parallel with shorter timeouts, and a server that exited from a signal no longer delays shutdown by 5 seconds
+- The Marketplace and Open VSX page describes what the extension does, how to get started, commands, settings, and troubleshooting. Build and publishing notes moved to `DEVELOPMENT.md` in the repository
+
 ## 0.8.3
 
 - HTML outside `<?tyhp` blocks is highlighted as HTML, and `<?= … ?>` is highlighted as Tyhp

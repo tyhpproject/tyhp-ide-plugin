@@ -86,6 +86,51 @@ test("proxy error is a warning when LSP is healthy", () => {
     assert.equal(view.error, false);
 });
 
+test("tooltip lists every language server with its pid", () => {
+    const view = formatStatusBar({
+        projectLabel: "demo",
+        lspState: "running",
+        binaryStatus: "ok",
+        binaryPath: "/bin/tyhp",
+        sessions: [
+            { label: "demo", state: "running", pid: 101, active: true },
+            { label: "api", state: "running", pid: 202, active: false },
+        ],
+    });
+    assert.equal(view.text, "$(check) Tyhp · demo · ready · +1 server");
+    assert.match(view.tooltip, /Language server processes \(2\):/);
+    assert.match(view.tooltip, / {2}demo: ready, pid 101 \(this file\)/);
+    assert.match(view.tooltip, / {2}api: ready, pid 202/);
+});
+
+test("stopped active session still reports servers running for other projects", () => {
+    const view = formatStatusBar({
+        projectLabel: "not in a Tyhp project",
+        lspState: "stopped",
+        binaryStatus: "ok",
+        binaryPath: "/bin/tyhp",
+        sessions: [
+            { label: "api", state: "running", pid: 202, active: false },
+            { label: "web", state: "starting", pid: 303, active: false },
+            { label: "old", state: "error", active: false },
+        ],
+    });
+    assert.equal(view.text, "$(debug-disconnect) Tyhp · not in a Tyhp project · LSP stopped · +2 servers");
+    assert.match(view.tooltip, / {2}old: error, no process/);
+});
+
+test("no sessions leaves text and tooltip unchanged", () => {
+    const view = formatStatusBar({
+        projectLabel: "demo",
+        lspState: "stopped",
+        binaryStatus: "ok",
+        binaryPath: "/bin/tyhp",
+        sessions: [],
+    });
+    assert.equal(view.text, "$(debug-disconnect) Tyhp · demo · LSP stopped");
+    assert.doesNotMatch(view.tooltip, /Language server processes/);
+});
+
 test("status-bar proxy actions cover start/stop/restart", () => {
     assert.deepEqual(proxyStatusActions("stopped"), ["start"]);
     assert.deepEqual(proxyStatusActions("running"), ["stop", "restart"]);
