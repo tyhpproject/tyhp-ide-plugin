@@ -93,6 +93,9 @@
         { "include": "source.tyhp.php#keyword-control" },
         { "include": "source.tyhp.php#php-namespace-declaration" },
         { "include": "source.tyhp.php#keyword-declaration" },
+        { "include": "#new-anonymous-struct-initializer" },
+        { "include": "#new-generic-struct-initializer" },
+        { "include": "#new-struct-initializer" },
         { "include": "#tyhp-anonymous-class" },
         { "include": "source.tyhp.php#new-expression" },
         { "include": "#tyhp-generic-in-code" },
@@ -287,6 +290,9 @@
           "match": "\\b(?i:extends)\\b",
           "name": "storage.modifier.extends.php"
         },
+        { "include": "#new-anonymous-struct-initializer" },
+        { "include": "#new-generic-struct-initializer" },
+        { "include": "#new-struct-initializer" },
         { "include": "#type-expression" },
         { "include": "source.tyhp.php#variable" },
         { "include": "source.tyhp.php#operator" },
@@ -668,6 +674,9 @@
         { "include": "#keyword-tyhp" },
         { "include": "#fn-declaration" },
         { "include": "#function-declaration" },
+        { "include": "#new-anonymous-struct-initializer" },
+        { "include": "#new-generic-struct-initializer" },
+        { "include": "#new-struct-initializer" },
         { "include": "#tyhp-anonymous-class" },
         { "include": "source.tyhp.php#new-expression" },
         { "include": "source.tyhp.php#class-reference-static" },
@@ -737,8 +746,119 @@
         { "include": "#type-expression" }
       ]
     },
+    "struct-entry-key": {
+      "match": "(?<!\\$)\\b(?!(?i:async|await|struct|extension|type|operator|using|with|is|typeof|nameof|variable_exists|deprecated|obsolete|void|parent|decimal|resource|function|fn|class|interface|trait|enum|namespace|use|const|var|public|protected|private|static|abstract|final|readonly|if|else|elseif|endif|while|endwhile|do|for|endfor|foreach|endforeach|switch|endswitch|case|default|break|continue|goto|return|yield|try|catch|finally|throw|declare|enddeclare|match|echo|print|new|clone|instanceof|as|extends|implements|insteadof|int|float|string|bool|never|mixed|object|iterable|array|callable|list|include_once|include|require_once|require|isset|empty|unset|eval|exit|die|true|false|null|self|and|or|xor)\\b)([a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*)\\s*(?==>)",
+      "captures": {
+        "1": { "name": "variable.other.property.php" }
+      }
+    },
+    "struct-nested-brackets": {
+      "begin": "\\[",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.array.begin.php" }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.array.end.php" }
+      },
+      "patterns": [
+        { "include": "#struct-initializer-content" }
+      ]
+    },
+    "struct-initializer-content": {
+      "patterns": [
+        { "include": "#struct-entry-key" },
+        { "include": "#struct-nested-brackets" },
+        { "include": "#tyhp-code-body" }
+      ]
+    },
+    "new-struct-initializer": {
+      "begin": "(\\b(?i:new)\\b)\\s+(?!(?i:self|static|parent|class)\\b)(\\\\?(?:[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*\\\\)*[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*)\\s*(\\[)",
+      "beginCaptures": {
+        "1": { "name": "keyword.other.new.php" },
+        "2": {
+          "patterns": [
+            { "match": "\\\\", "name": "punctuation.separator.inheritance.php" },
+            { "match": "[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*", "name": "support.class.php" }
+          ]
+        },
+        "3": { "name": "punctuation.section.array.begin.php" }
+      },
+      "end": "(\\])",
+      "endCaptures": {
+        "1": { "name": "punctuation.section.array.end.php" }
+      },
+      "patterns": [
+        { "include": "#struct-initializer-content" }
+      ]
+    },
+    "new-generic-struct-initializer": {
+      "begin": "(\\b(?i:new)\\b)\\s+(?!(?i:self|static|parent|class)\\b)(\\\\?(?:[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*\\\\)*[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*)\\s*(<)((?:[^<>\"']++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|<(?:[^<>\"']++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|<(?:[^<>\"']++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|<(?:[^<>\"']++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|<(?:[^<>\"']++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|<(?:[^<>\"']++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|<(?:[^<>\"']++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+')*+>)*+>)*+>)*+>)*+>)*+>)*+)(>)\\s*(\\[)",
+      "beginCaptures": {
+        "1": { "name": "keyword.other.new.php" },
+        "2": {
+          "patterns": [
+            { "match": "\\\\", "name": "punctuation.separator.inheritance.php" },
+            { "match": "[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*", "name": "support.class.php" }
+          ]
+        },
+        "3": { "name": "punctuation.definition.generic.begin.tyhp" },
+        "4": {
+          "patterns": [
+            { "include": "#type-expression" },
+            { "match": ",", "name": "punctuation.separator.type.tyhp" }
+          ]
+        },
+        "5": { "name": "punctuation.definition.generic.end.tyhp" },
+        "6": { "name": "punctuation.section.array.begin.php" }
+      },
+      "end": "(\\])",
+      "endCaptures": {
+        "1": { "name": "punctuation.section.array.end.php" }
+      },
+      "patterns": [
+        { "include": "#struct-initializer-content" }
+      ]
+    },
+    "new-anonymous-struct-initializer": {
+      "begin": "(\\b(?i:new)\\b)\\s+(\\b(?i:struct)\\b)\\s*(\\{)((?:[^{}\"'`/]++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|`(?:\\\\.|[^`\\\\])*+|//[^\\n]*+|/\\*(?:(?!\\*/)[\\s\\S])*+\\*/|#[^\\n}]*+|/|\\{(?:[^{}\"'`/]++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|`(?:\\\\.|[^`\\\\])*+|//[^\\n]*+|/\\*(?:(?!\\*/)[\\s\\S])*+\\*/|#[^\\n}]*+|/|\\{(?:[^{}\"'`/]++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|`(?:\\\\.|[^`\\\\])*+|//[^\\n]*+|/\\*(?:(?!\\*/)[\\s\\S])*+\\*/|#[^\\n}]*+|/|\\{(?:[^{}\"'`/]++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|`(?:\\\\.|[^`\\\\])*+|//[^\\n]*+|/\\*(?:(?!\\*/)[\\s\\S])*+\\*/|#[^\\n}]*+|/|\\{(?:[^{}\"'`/]++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|`(?:\\\\.|[^`\\\\])*+|//[^\\n]*+|/\\*(?:(?!\\*/)[\\s\\S])*+\\*/|#[^\\n}]*+|/|\\{(?:[^{}\"'`/]++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|`(?:\\\\.|[^`\\\\])*+|//[^\\n]*+|/\\*(?:(?!\\*/)[\\s\\S])*+\\*/|#[^\\n}]*+|/|\\{(?:[^{}\"'`/]++|\"(?:\\\\.|[^\"\\\\])*+\"|'(?:\\\\.|[^'\\\\])*+'|`(?:\\\\.|[^`\\\\])*+|//[^\\n]*+|/\\*(?:(?!\\*/)[\\s\\S])*+\\*/|#[^\\n}]*+|/)*+\\})*+\\})*+\\})*+\\})*+\\})*+\\})*+)(\\})\\s*(\\[)",
+      "beginCaptures": {
+        "1": { "name": "keyword.other.new.php" },
+        "2": { "name": "storage.type.struct.tyhp" },
+        "3": { "name": "punctuation.definition.class.body.begin.tyhp" },
+        "4": {
+          "patterns": [
+            { "include": "#tyhp-class-member" }
+          ]
+        },
+        "5": { "name": "punctuation.definition.class.body.end.tyhp" },
+        "6": { "name": "punctuation.section.array.begin.php" }
+      },
+      "end": "(\\])",
+      "endCaptures": {
+        "1": { "name": "punctuation.section.array.end.php" }
+      },
+      "patterns": [
+        { "include": "#struct-initializer-content" }
+      ]
+    },
+    "with-struct-initializer": {
+      "begin": "(\\b(?i:with)\\b)\\s*(\\[)",
+      "beginCaptures": {
+        "1": { "name": "keyword.operator.with.tyhp" },
+        "2": { "name": "punctuation.section.array.begin.php" }
+      },
+      "end": "(\\])",
+      "endCaptures": {
+        "1": { "name": "punctuation.section.array.end.php" }
+      },
+      "patterns": [
+        { "include": "#struct-initializer-content" }
+      ]
+    },
     "keyword-tyhp": {
       "patterns": [
+        { "include": "#with-struct-initializer" },
         {
           "match": "\\b(?i:async|await)\\b",
           "name": "keyword.control.async.tyhp"
