@@ -633,7 +633,7 @@
       ]
     },
     "operator-overload": {
-      "begin": "(?:(?i:\\b(abstract|final)\\s+)?(?i:\\b(operator)\\s+)(\\*\\*|\\+\\+|--|===|!==|<=>|<=|>=|<<|>>|==|!=|\\+|-|\\*|/|%|~|!|\\.|<|&|\\^|\\||(?i:true|false|empty|null|convert)))",
+      "begin": "(?:(?i:\\b(abstract|final)\\s+)?(?i:\\b(operator)\\s+)(\\*\\*|\\+\\+|--|===|!==|<=>|<=|>=|<<|>>|==|!=|\\+|-|\\*|/|%|~|!|\\.|<|&|\\^|\\||(?i:true|false|empty|null|convert|default)))",
       "beginCaptures": {
         "1": { "name": "storage.modifier.php" },
         "2": { "name": "storage.type.operator.tyhp" },

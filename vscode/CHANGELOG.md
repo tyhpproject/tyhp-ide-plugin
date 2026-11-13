@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- `operator default` is highlighted as an operator name
 - Struct initializers highlight the type in `new Name[…]`, `new Name<…>[…]`, and `new struct { … }[…]`. Bare keys in those lists and in `with […]` highlight as property names
 
 ## 0.8.4
